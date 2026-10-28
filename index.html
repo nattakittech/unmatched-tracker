@@ -125,6 +125,9 @@
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-slate-950 shadow-md">
           <i data-lucide="layout-grid" class="w-4 h-4"></i> แดชบอร์ด
         </button>
+        <button onclick="switchTab('players')" id="nav-players" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+          <i data-lucide="user-check" class="w-4 h-4"></i> ผู้เล่น & อันดับ
+        </button>
         <button onclick="switchTab('matchups')" id="nav-matchups" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="crosshair" class="w-4 h-4"></i> วิเคราะห์คู่ต่อสู้ (H2H)
         </button>
@@ -256,18 +259,73 @@
         </div>
 
         <!-- Recent Battles Feed (5 cols) -->
-        <div class="lg:col-span-5 bg-[#0f172a]/80 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="font-title text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
-              <i data-lucide="clock" class="w-5 h-5 text-indigo-400"></i> การต่อสู้ล่าสุด
-            </h2>
-            <button onclick="switchTab('history')" class="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 transition">
-              ดูทั้งหมด <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+      </div>
+    </section>
+
+    <!-- 1.5 PLAYER LEADERBOARD & STATS VIEW -->
+    <section id="view-players" class="space-y-6 hidden">
+      <!-- Players Top Banner & Player Selector -->
+      <div class="bg-gradient-to-r from-slate-900 via-[#101b38] to-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-2">
+              <i data-lucide="user-check" class="w-3.5 h-3.5"></i> PLAYER RANKING & DOSSIER
+            </div>
+            <h2 class="font-title text-xl sm:text-2xl font-bold text-white">ทำเนียบและสถิติผู้เล่น</h2>
+            <p class="text-xs sm:text-sm text-slate-400">วิเคราะห์ฝีมือรายบุคคล ตัวละครประจำตัว (Signature Hero) และผลการเจอกันในกลุ่ม</p>
+          </div>
+          <div class="flex items-center gap-2 self-start md:self-auto">
+            <button onclick="openNewPlayerModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg shadow-indigo-600/20">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> เพิ่มรายชื่อผู้เล่น
             </button>
           </div>
-          
-          <div id="recent-battles-list" class="space-y-3 overflow-y-auto max-h-[460px] pr-1">
-            <!-- Dynamically generated match cards -->
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-3">
+          <span class="text-xs font-semibold text-slate-400 flex items-center gap-1">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-amber-400"></i> เลือกผู้เล่นเพื่อดูข้อมูลเชิงลึก:
+          </span>
+          <select id="player-profile-selector" onchange="renderPlayerProfile()" class="bg-slate-950 border border-slate-700 hover:border-amber-500/60 rounded-xl px-3 py-1.5 text-xs font-bold text-amber-300 focus:outline-none transition">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Main Layout: Player Leaderboard Table + Player Profile Card -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Player Leaderboard Table (6 cols) -->
+        <div class="lg:col-span-6 bg-[#0f172a]/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-title text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
+                <i data-lucide="medal" class="w-5 h-5 text-amber-400"></i> ตารางอันดับผู้เล่น (Leaderboard)
+              </h3>
+              <p class="text-xs text-slate-400">เรียงตามอัตราการชนะ (Win Rate) และจำนวนชัยชนะ</p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead>
+                <tr class="border-b border-slate-800 text-slate-400 uppercase text-[11px] font-semibold tracking-wider">
+                  <th class="py-2.5 px-3">อันดับ / ผู้เล่น</th>
+                  <th class="py-2.5 px-2 text-center">แข่ง</th>
+                  <th class="py-2.5 px-2 text-center text-emerald-400">ชนะ</th>
+                  <th class="py-2.5 px-2 text-center text-rose-400">แพ้</th>
+                  <th class="py-2.5 px-3 text-right">Win Rate</th>
+                </tr>
+              </thead>
+              <tbody id="player-leaderboard-rows" class="divide-y divide-slate-800/60">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Selected Player Dossier Card (6 cols) -->
+        <div class="lg:col-span-6 space-y-4">
+          <div id="player-profile-container">
+            <!-- Rendered via JS -->
           </div>
         </div>
       </div>
@@ -406,26 +464,30 @@
   </main>
 
   <!-- MOBILE BOTTOM NAVIGATION BAR -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a1020]/95 backdrop-blur-lg border-t border-slate-800/90 px-3 py-2 flex items-center justify-around">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a1020]/95 backdrop-blur-lg border-t border-slate-800/90 px-2 py-2 flex items-center justify-around">
     <button onclick="switchTab('dashboard')" id="mob-dashboard" class="flex flex-col items-center gap-1 text-amber-400">
-      <i data-lucide="layout-grid" class="w-5 h-5"></i>
-      <span class="text-[10px] font-bold">แดชบอร์ด</span>
+      <i data-lucide="layout-grid" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">แดชบอร์ด</span>
+    </button>
+    <button onclick="switchTab('players')" id="mob-players" class="flex flex-col items-center gap-1 text-slate-400">
+      <i data-lucide="user-check" class="w-4 h-4"></i>
+      <span class="text-[9px] font-medium">ผู้เล่น</span>
     </button>
     <button onclick="switchTab('matchups')" id="mob-matchups" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="crosshair" class="w-5 h-5"></i>
-      <span class="text-[10px] font-medium">H2H</span>
+      <i data-lucide="crosshair" class="w-4 h-4"></i>
+      <span class="text-[9px] font-medium">H2H</span>
     </button>
     <button onclick="switchTab('timeline')" id="mob-timeline" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="calendar" class="w-5 h-5"></i>
-      <span class="text-[10px] font-medium">ไทม์ไลน์</span>
+      <i data-lucide="calendar" class="w-4 h-4"></i>
+      <span class="text-[9px] font-medium">ไทม์ไลน์</span>
     </button>
     <button onclick="switchTab('history')" id="mob-history" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="history" class="w-5 h-5"></i>
-      <span class="text-[10px] font-medium">ประวัติ</span>
+      <i data-lucide="history" class="w-4 h-4"></i>
+      <span class="text-[9px] font-medium">ประวัติ</span>
     </button>
     <button onclick="switchTab('roster')" id="mob-roster" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="users" class="w-5 h-5"></i>
-      <span class="text-[10px] font-medium">ฮีโร่</span>
+      <i data-lucide="users" class="w-4 h-4"></i>
+      <span class="text-[9px] font-medium">ฮีโร่</span>
     </button>
   </nav>
 
@@ -470,8 +532,13 @@
               </select>
             </div>
             <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">ชื่อผู้เล่น (Player Name)</label>
-              <input type="text" id="match-winner-player" placeholder="เช่น กอล์ฟ, Alice" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-[11px] font-semibold text-slate-300">เลือกผู้เล่น (Player Name) *</label>
+                <button type="button" onclick="openNewPlayerModal()" class="text-[10px] text-indigo-400 hover:underline">+ เพิ่มคนใหม่</button>
+              </div>
+              <select id="match-winner-player" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
+                <!-- Options populated by JS -->
+              </select>
             </div>
           </div>
           <div class="w-1/2">
@@ -495,8 +562,10 @@
               </select>
             </div>
             <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">ชื่อผู้เล่น (Player Name)</label>
-              <input type="text" id="match-loser-player" placeholder="เช่น บอส, Bob" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-rose-500 focus:outline-none">
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">เลือกผู้เล่น (Player Name) *</label>
+              <select id="match-loser-player" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-rose-500 focus:outline-none">
+                <!-- Options populated by JS -->
+              </select>
             </div>
           </div>
         </div>
@@ -558,23 +627,50 @@
       <form id="form-custom-hero" onsubmit="handleSaveCustomHero(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อฮีโร่ (Hero Name) *</label>
-          <input type="text" id="custom-hero-name" required placeholder="เช่น Deadpool, Luke Cage, หรือชื่อที่ออกแบบเอง" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+          <input type="text" id="custom-hero-name" required placeholder="เช่น Deadpool, Bruce Lee" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">กล่อง / ภาค (Set Name)</label>
-          <input type="text" id="custom-hero-set" placeholder="เช่น Marvel Series, Custom Fan Set" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อกล่อง / ชุด (Set / Expansion Name)</label>
+          <input type="text" id="custom-hero-set" placeholder="เช่น Custom Hero / กล่องเสริม" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">สีประจำตัว (Hex Color)</label>
-          <div class="flex items-center gap-2">
-            <input type="color" id="custom-hero-color" value="#6366f1" class="w-10 h-8 rounded bg-transparent border-0 cursor-pointer">
-            <span class="text-xs text-slate-400">เลือกสีเพื่อแสดงบนการ์ดและป้ายชื่อ</span>
-          </div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">สีประจำตัว (Hero Color Badge)</label>
+          <input type="color" id="custom-hero-color" value="#6366f1" class="w-full h-8 bg-slate-950 border border-slate-700 rounded-lg cursor-pointer">
         </div>
 
         <div class="pt-3 flex justify-end gap-2">
           <button type="button" onclick="closeModal('modal-custom-hero')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800">ยกเลิก</button>
           <button type="submit" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg">บันทึกฮีโร่</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2.5 ADD NEW PLAYER MODAL -->
+  <div id="modal-new-player" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[#0f172a] border border-slate-800 w-full max-w-sm rounded-2xl shadow-2xl p-5 relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+        <h3 class="font-title font-bold text-base text-white flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-4 h-4 text-indigo-400"></i> เพิ่มรายชื่อผู้เล่นใหม่
+        </h3>
+        <button onclick="closeModal('modal-new-player')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-new-player" onsubmit="handleSaveNewPlayer(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อผู้เล่น (Player Name / Nickname) *</label>
+          <input type="text" id="new-player-name" required placeholder="เช่น Golf, Boss, Aom, Ton" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">ฉายาหรือข้อความแนะนำตัว (Optional)</label>
+          <input type="text" id="new-player-tagline" placeholder="เช่น เจ้าแห่งเมดูซ่า, สายป้องกัน" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+        </div>
+
+        <div class="pt-3 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-new-player')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800">ยกเลิก</button>
+          <button type="submit" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg">บันทึกชื่อผู้เล่น</button>
         </div>
       </form>
     </div>
@@ -791,6 +887,13 @@
     /* ========================================================
        1. INITIAL HERO PRESETS & DATA SCHEMA
        ======================================================== */
+    const DEFAULT_PLAYERS = [
+      { id: 'golf', name: 'Golf', tagline: 'จอมวางแผน' },
+      { id: 'boss', name: 'Boss', tagline: 'สายบุกทะลวง' },
+      { id: 'aom', name: 'Aom', tagline: 'ผู้หยั่งรู้' },
+      { id: 'ton', name: 'Ton', tagline: 'โคลนลวงตา' }
+    ];
+
     const DEFAULT_HEROES = [
       { id: 'medusa', name: 'Medusa', set: 'Battle of Legends, Vol. 1', color: '#10b981' },
       { id: 'king-arthur', name: 'King Arthur', set: 'Battle of Legends, Vol. 1', color: '#f59e0b' },
@@ -898,9 +1001,11 @@
     // App State
     let heroes = [];
     let matches = [];
+    let players = [];
     let currentTab = 'dashboard';
     let timelineGranularity = 'day'; // 'day' | 'month' | 'year'
     let selectedTimelinePeriod = null;
+    let selectedPlayerId = null;
 
     // Cloud Database & Auth State
     let db = null;
@@ -964,10 +1069,8 @@
             snapshot.forEach(docSnap => {
               cloudHeroes.push(docSnap.data());
             });
-            // Merge defaults if needed or take cloud heroes
             heroes = cloudHeroes.length > 0 ? cloudHeroes : [...DEFAULT_HEROES];
           } else {
-            // Seed initial heroes if empty in cloud
             heroes = [...DEFAULT_HEROES];
             seedInitialHeroesToCloud(heroesCollectionRef);
           }
@@ -975,6 +1078,25 @@
           refreshAllViews();
         }, (error) => {
           console.error("Heroes realtime listener error:", error);
+        });
+
+        // Setup Realtime Sync for Players (Public Collection)
+        const playersCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'players');
+        onSnapshot(playersCollectionRef, (snapshot) => {
+          if (!snapshot.empty) {
+            const cloudPlayers = [];
+            snapshot.forEach(docSnap => {
+              cloudPlayers.push(docSnap.data());
+            });
+            players = cloudPlayers.length > 0 ? cloudPlayers : [...DEFAULT_PLAYERS];
+          } else {
+            players = [...DEFAULT_PLAYERS];
+            seedInitialPlayersToCloud(playersCollectionRef);
+          }
+          populatePlayerDropdowns();
+          refreshAllViews();
+        }, (error) => {
+          console.error("Players realtime listener error:", error);
         });
 
         // Setup Realtime Sync for Matches (Public Collection)
@@ -1049,6 +1171,19 @@
       }
     }
 
+    async function seedInitialPlayersToCloud(collectionRef) {
+      if (!db || !auth.currentUser) return;
+      try {
+        const { doc, setDoc } = window._fb;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
+        for (const p of DEFAULT_PLAYERS) {
+          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', p.id), p);
+        }
+      } catch(e) {
+        console.warn('Seeding players skipped/failed', e);
+      }
+    }
+
     async function seedInitialMatchesToCloud(collectionRef) {
       if (!db || !auth.currentUser) return;
       try {
@@ -1063,15 +1198,39 @@
     }
 
     function initAppFallback() {
-      heroes = [...DEFAULT_HEROES];
-      matches = [...SAMPLE_MATCHES];
+      // Load from LocalStorage if available
+      const localPlayers = localStorage.getItem('unmatched_local_players');
+      const localHeroes = localStorage.getItem('unmatched_local_heroes');
+      const localMatches = localStorage.getItem('unmatched_local_matches');
+
+      players = localPlayers ? JSON.parse(localPlayers) : [...DEFAULT_PLAYERS];
+      heroes = localHeroes ? JSON.parse(localHeroes) : [...DEFAULT_HEROES];
+      matches = localMatches ? JSON.parse(localMatches) : [...SAMPLE_MATCHES];
+
       populateHeroDropdowns();
+      populatePlayerDropdowns();
       refreshAllViews();
       lucide.createIcons();
     }
 
+    function saveLocalData() {
+      try {
+        localStorage.setItem('unmatched_local_players', JSON.stringify(players));
+        localStorage.setItem('unmatched_local_heroes', JSON.stringify(heroes));
+        localStorage.setItem('unmatched_local_matches', JSON.stringify(matches));
+      } catch(e) {
+        console.warn('Local storage save failed', e);
+      }
+    }
+
     function getHero(id) {
       return heroes.find(h => h.id === id) || { id, name: id, set: 'Custom', color: '#94a3b8' };
+    }
+
+    function getPlayer(nameOrId) {
+      if (!nameOrId) return { id: 'unknown', name: 'ไม่ระบุชื่อ', tagline: '' };
+      const found = players.find(p => p.id === nameOrId || p.name.toLowerCase() === nameOrId.toLowerCase());
+      return found || { id: nameOrId, name: nameOrId, tagline: '' };
     }
 
     /* ========================================================
@@ -1079,7 +1238,7 @@
        ======================================================== */
     function switchTab(tabId) {
       currentTab = tabId;
-      const views = ['dashboard', 'matchups', 'timeline', 'history', 'roster'];
+      const views = ['dashboard', 'players', 'matchups', 'timeline', 'history', 'roster'];
       
       views.forEach(v => {
         const el = document.getElementById(`view-${v}`);
@@ -1088,33 +1247,32 @@
 
         if (v === tabId) {
           if (el) el.classList.remove('hidden');
-          // Desktop styling
           if (navDesktop) {
             navDesktop.className = 'tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-slate-950 shadow-md';
           }
-          // Mobile styling
           if (navMob) {
             navMob.className = 'flex flex-col items-center gap-1 text-amber-400';
             const span = navMob.querySelector('span');
-            if (span) span.className = 'text-[10px] font-bold';
+            if (span) span.className = 'text-[9px] font-bold';
           }
         } else {
           if (el) el.classList.add('hidden');
-          // Desktop styling
           if (navDesktop) {
             navDesktop.className = 'tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all';
           }
-          // Mobile styling
           if (navMob) {
             navMob.className = 'flex flex-col items-center gap-1 text-slate-400';
             const span = navMob.querySelector('span');
-            if (span) span.className = 'text-[10px] font-medium';
+            if (span) span.className = 'text-[9px] font-medium';
           }
         }
       });
 
-      // Special triggers on tab activation
-      if (tabId === 'matchups') {
+      // Triggers
+      if (tabId === 'players') {
+        renderPlayerLeaderboard();
+        renderPlayerProfile();
+      } else if (tabId === 'matchups') {
         renderH2HDossier();
       } else if (tabId === 'timeline') {
         renderTimelineView();
@@ -1133,6 +1291,8 @@
     function refreshAllViews() {
       renderDashboard();
       renderLeaderboard();
+      renderPlayerLeaderboard();
+      renderPlayerProfile();
       renderRecentBattles();
       renderH2HDossier();
       renderTimelineView();
@@ -1141,11 +1301,341 @@
     }
 
     /* ========================================================
-       4. DASHBOARD & STATS LOGIC
+       4.5 PLAYER LEADERBOARD & DOSSIER LOGIC
        ======================================================== */
+    function populatePlayerDropdowns() {
+      const winnerPlayerSelect = document.getElementById('match-winner-player');
+      const loserPlayerSelect = document.getElementById('match-loser-player');
+      const profilePlayerSelect = document.getElementById('player-profile-selector');
+
+      const sortedPlayers = [...players].sort((a, b) => a.name.localeCompare(b.name));
+
+      const optionsHtml = sortedPlayers.map(p => `<option value="${p.name}">${p.name} ${p.tagline ? `(${p.tagline})` : ''}</option>`).join('');
+
+      if (winnerPlayerSelect) winnerPlayerSelect.innerHTML = optionsHtml;
+      if (loserPlayerSelect) {
+        loserPlayerSelect.innerHTML = optionsHtml;
+        if (sortedPlayers.length > 1) loserPlayerSelect.selectedIndex = 1;
+      }
+      if (profilePlayerSelect) {
+        profilePlayerSelect.innerHTML = sortedPlayers.map(p => `<option value="${p.id}">👤 ข้อมูลสถิติของ: ${p.name}</option>`).join('');
+      }
+    }
+
+    function computePlayerStats() {
+      const stats = {};
+
+      players.forEach(p => {
+        stats[p.name.toLowerCase()] = {
+          player: p,
+          matches: 0,
+          wins: 0,
+          losses: 0,
+          winrate: 0,
+          heroUsage: {}, // heroId: { played: 0, wins: 0, losses: 0 }
+          opponents: {}  // oppPlayerName: { played: 0, wins: 0, losses: 0 }
+        };
+      });
+
+      matches.forEach(m => {
+        const winName = (m.winnerPlayer || '').trim();
+        const loseName = (m.loserPlayer || '').trim();
+
+        if (winName) {
+          const keyW = winName.toLowerCase();
+          if (!stats[keyW]) {
+            stats[keyW] = {
+              player: { id: keyW, name: winName, tagline: '' },
+              matches: 0, wins: 0, losses: 0, winrate: 0, heroUsage: {}, opponents: {}
+            };
+          }
+          stats[keyW].matches++;
+          stats[keyW].wins++;
+
+          // Hero usage
+          if (!stats[keyW].heroUsage[m.winnerHero]) {
+            stats[keyW].heroUsage[m.winnerHero] = { played: 0, wins: 0, losses: 0 };
+          }
+          stats[keyW].heroUsage[m.winnerHero].played++;
+          stats[keyW].heroUsage[m.winnerHero].wins++;
+
+          // Opponent
+          if (loseName) {
+            if (!stats[keyW].opponents[loseName]) {
+              stats[keyW].opponents[loseName] = { played: 0, wins: 0, losses: 0 };
+            }
+            stats[keyW].opponents[loseName].played++;
+            stats[keyW].opponents[loseName].wins++;
+          }
+        }
+
+        if (loseName) {
+          const keyL = loseName.toLowerCase();
+          if (!stats[keyL]) {
+            stats[keyL] = {
+              player: { id: keyL, name: loseName, tagline: '' },
+              matches: 0, wins: 0, losses: 0, winrate: 0, heroUsage: {}, opponents: {}
+            };
+          }
+          stats[keyL].matches++;
+          stats[keyL].losses++;
+
+          // Hero usage
+          if (!stats[keyL].heroUsage[m.loserHero]) {
+            stats[keyL].heroUsage[m.loserHero] = { played: 0, wins: 0, losses: 0 };
+          }
+          stats[keyL].heroUsage[m.loserHero].played++;
+          stats[keyL].heroUsage[m.loserHero].losses++;
+
+          // Opponent
+          if (winName) {
+            if (!stats[keyL].opponents[winName]) {
+              stats[keyL].opponents[winName] = { played: 0, wins: 0, losses: 0 };
+            }
+            stats[keyL].opponents[winName].played++;
+            stats[keyL].opponents[winName].losses++;
+          }
+        }
+      });
+
+      Object.values(stats).forEach(s => {
+        s.winrate = s.matches > 0 ? Math.round((s.wins / s.matches) * 100) : 0;
+      });
+
+      return stats;
+    }
+
+    function renderPlayerLeaderboard() {
+      const tbody = document.getElementById('player-leaderboard-rows');
+      if (!tbody) return;
+
+      const stats = computePlayerStats();
+      const list = Object.values(stats);
+
+      // Sort by Win Rate then Wins then Matches
+      list.sort((a, b) => {
+        if (b.matches === 0 && a.matches === 0) return a.player.name.localeCompare(b.player.name);
+        return (b.winrate - a.winrate) || (b.wins - a.wins) || (b.matches - a.matches);
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">ยังไม่มีข้อมูลผู้เล่น</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map((item, idx) => {
+        const p = item.player;
+        const wrColor = item.winrate >= 60 ? 'text-emerald-400' : (item.winrate <= 40 ? 'text-rose-400' : 'text-amber-400');
+        const medal = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `${idx + 1}`));
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition cursor-pointer group" onclick="jumpToPlayer('${p.id || p.name}')">
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 text-center text-xs font-bold text-slate-400">${medal}</span>
+                <div class="w-8 h-8 rounded-full bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center font-bold text-indigo-300 shrink-0 text-xs">
+                  ${p.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="truncate">
+                  <span class="font-bold text-slate-100 group-hover:text-amber-400 transition">${p.name}</span>
+                  <p class="text-[10px] text-slate-500 truncate">${p.tagline || 'สมาชิกในก๊วน'}</p>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-2 text-center font-semibold text-slate-300">${item.matches}</td>
+            <td class="py-3 px-2 text-center font-bold text-emerald-400">${item.wins}</td>
+            <td class="py-3 px-2 text-center font-bold text-rose-400">${item.losses}</td>
+            <td class="py-3 px-3 text-right">
+              <div class="inline-flex flex-col items-end">
+                <span class="font-black ${wrColor}">${item.matches > 0 ? item.winrate + '%' : '-'}</span>
+                <div class="w-16 bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
+                  <div class="bg-indigo-500 h-full rounded-full" style="width: ${item.winrate}%"></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function jumpToPlayer(playerIdOrName) {
+      switchTab('players');
+      const selector = document.getElementById('player-profile-selector');
+      if (selector) {
+        // match by value or option text
+        for (let i = 0; i < selector.options.length; i++) {
+          if (selector.options[i].value.toLowerCase() === playerIdOrName.toLowerCase() ||
+              selector.options[i].text.toLowerCase().includes(playerIdOrName.toLowerCase())) {
+            selector.selectedIndex = i;
+            break;
+          }
+        }
+        renderPlayerProfile();
+      }
+    }
+
+    function renderPlayerProfile() {
+      const selector = document.getElementById('player-profile-selector');
+      const container = document.getElementById('player-profile-container');
+      if (!selector || !container) return;
+
+      const playerId = selector.value || (players[0] ? players[0].id : null);
+      if (!playerId) {
+        container.innerHTML = `<div class="p-6 bg-slate-900 border border-slate-800 rounded-2xl text-center text-slate-500">กรุณาเพิ่มหรือเลือกผู้เล่น</div>`;
+        return;
+      }
+
+      const playerObj = getPlayer(playerId);
+      const stats = computePlayerStats();
+      const pStat = stats[playerObj.name.toLowerCase()] || { matches: 0, wins: 0, losses: 0, winrate: 0, heroUsage: {}, opponents: {} };
+
+      // Calculate Most Played Hero & Signature (Best Winrate) Hero
+      const heroUsageList = Object.entries(pStat.heroUsage).map(([hId, val]) => {
+        const wr = val.played > 0 ? Math.round((val.wins / val.played) * 100) : 0;
+        return { hero: getHero(hId), ...val, winrate: wr };
+      });
+      heroUsageList.sort((a, b) => b.played - a.played || b.wins - a.wins);
+
+      const mostPlayed = heroUsageList.length > 0 ? heroUsageList[0] : null;
+      const signatureHero = heroUsageList.length > 0 ? [...heroUsageList].sort((a, b) => b.winrate - a.winrate || b.wins - a.wins)[0] : null;
+
+      // Opponent Head-to-Head
+      const oppList = Object.entries(pStat.opponents).map(([oppName, val]) => {
+        const wr = val.played > 0 ? Math.round((val.wins / val.played) * 100) : 0;
+        return { oppName, ...val, winrate: wr };
+      });
+      oppList.sort((a, b) => b.played - a.played);
+
+      container.innerHTML = `
+        <!-- Profile Header -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-amber-500 flex items-center justify-center font-title font-black text-2xl text-white shadow-lg border border-white/20">
+                ${playerObj.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">PLAYER PROFILE</span>
+                <h3 class="font-title text-2xl font-black text-white mt-1">${playerObj.name}</h3>
+                <p class="text-xs text-slate-400">${playerObj.tagline || 'ผู้เล่นประจำกลุ่ม'}</p>
+              </div>
+            </div>
+
+            <!-- Stats Badge -->
+            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-center min-w-[90px]">
+              <span class="text-[10px] uppercase font-bold text-slate-400">WIN RATE</span>
+              <p class="text-xl font-black ${pStat.winrate >= 50 ? 'text-emerald-400' : 'text-rose-400'}">${pStat.matches > 0 ? pStat.winrate + '%' : '-'}</p>
+              <p class="text-[10px] text-slate-500">${pStat.wins}W - ${pStat.losses}L</p>
+            </div>
+          </div>
+
+          <!-- Quick Highlight: Most Played & Best Hero -->
+          <div class="grid grid-cols-2 gap-2.5 mt-4 pt-4 border-t border-slate-800/80">
+            <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
+                <i data-lucide="shield" class="w-3 h-3 text-amber-400"></i> ตัวที่หยิบบ่อยสุด
+              </span>
+              <p class="text-xs font-bold text-amber-300 mt-1 truncate">${mostPlayed ? mostPlayed.hero.name : '-'}</p>
+              <p class="text-[10px] text-slate-500">${mostPlayed ? `เล่น ${mostPlayed.played} เกม (${mostPlayed.winrate}%)` : 'ยังไม่มีข้อมูล'}</p>
+            </div>
+
+            <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
+                <i data-lucide="flame" class="w-3 h-3 text-rose-400"></i> ตัวเก่งที่สุด (Signature)
+              </span>
+              <p class="text-xs font-bold text-emerald-400 mt-1 truncate">${signatureHero ? signatureHero.hero.name : '-'}</p>
+              <p class="text-[10px] text-slate-500">${signatureHero ? `ชนะ ${signatureHero.winrate}% (${signatureHero.wins}W)` : 'ยังไม่มีข้อมูล'}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Pool Breakdown by this Player -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+          <h4 class="font-title text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i> สถิติการหยิบฮีโร่ของ ${playerObj.name}
+          </h4>
+          ${heroUsageList.length === 0 ? `
+            <p class="text-xs text-slate-500 text-center py-4">ยังไม่เคยมีบันทึกการเล่นของ ${playerObj.name}</p>
+          ` : `
+            <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+              ${heroUsageList.map(h => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs">
+                  <div class="flex items-center gap-2 truncate">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${h.hero.color}"></span>
+                    <span class="font-bold text-slate-200 truncate">${h.hero.name}</span>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <span class="font-bold ${h.winrate >= 50 ? 'text-emerald-400' : 'text-rose-400'}">${h.winrate}%</span>
+                    <span class="text-[10px] text-slate-500 ml-1">(${h.wins}W - ${h.losses}L)</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+
+        <!-- H2H Against other Players -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+          <h4 class="font-title text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <i data-lucide="swords" class="w-4 h-4 text-amber-400"></i> ผลการเจอกับเพื่อนในกลุ่ม
+          </h4>
+          ${oppList.length === 0 ? `
+            <p class="text-xs text-slate-500 text-center py-4">ยังไม่มีประวัติการปะทะกับเพื่อนคนอื่น</p>
+          ` : `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              ${oppList.map(o => `
+                <div class="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between text-xs">
+                  <span class="font-bold text-slate-300">vs ${o.oppName}</span>
+                  <div class="text-right">
+                    <span class="font-black ${o.winrate >= 50 ? 'text-emerald-400' : 'text-rose-400'}">${o.winrate}%</span>
+                    <p class="text-[10px] text-slate-500">${o.wins}W - ${o.losses}L</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function openNewPlayerModal() {
+      document.getElementById('form-new-player').reset();
+      openModal('modal-new-player');
+    }
+
+    async function handleSaveNewPlayer(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-player-name').value.trim();
+      const tagline = document.getElementById('new-player-tagline').value.trim();
+      if (!name) return;
+
+      const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 1000);
+      const newPlayer = { id: slug, name, tagline };
+
+      players.push(newPlayer);
+      saveLocalData();
+      populatePlayerDropdowns();
+      closeModal('modal-new-player');
+      showToast(`เพิ่มผู้เล่น "${name}" เรียบร้อยแล้ว!`);
+
+      // Sync to cloud if ready
+      if (isCloudReady && db && auth.currentUser) {
+        try {
+          const { doc, setDoc } = window._fb;
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
+          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', slug), newPlayer);
+        } catch(err) {
+          console.warn('Cloud sync error for new player', err);
+        }
+      }
+
+      renderPlayerLeaderboard();
+      renderPlayerProfile();
+    }
+
     function computeHeroStats() {
       const stats = {};
-      
       heroes.forEach(h => {
         stats[h.id] = {
           hero: h,
@@ -1153,7 +1643,7 @@
           wins: 0,
           losses: 0,
           winrate: 0,
-          headToHead: {} // opponentId: { played: 0, wins: 0, losses: 0 }
+          headToHead: {}
         };
       });
 
@@ -2073,126 +2563,11 @@
       };
 
       matches.unshift(newMatch);
-      saveMatches();
+      saveLocalData();
       closeModal('modal-record-match');
       showToast('บันทึกผลการแข่งขันเรียบร้อยแล้ว!');
 
       refreshAllViews();
-    }
-
-    function handleDeleteMatch(id) {
-      if (!confirm('ต้องการลบประวัติการแข่งแมตช์นี้หรือไม่?')) return;
-      matches = matches.filter(m => m.id !== id);
-      saveMatches();
-      showToast('ลบแมตช์เรียบร้อยแล้ว');
-      refreshAllViews();
-    }
-
-    /* ========================================================
-       9. CUSTOM HERO CREATION
-       ======================================================== */
-    function openCustomHeroModal() {
-      document.getElementById('form-custom-hero').reset();
-      openModal('modal-custom-hero');
-    }
-
-    function handleSaveCustomHero(e) {
-      e.preventDefault();
-      const name = document.getElementById('custom-hero-name').value.trim();
-      const set = document.getElementById('custom-hero-set').value.trim() || 'Custom Fan Hero';
-      const color = document.getElementById('custom-hero-color').value;
-
-      if (!name) return;
-
-      const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 1000);
-      const newHero = { id: slug, name, set, color };
-
-      heroes.push(newHero);
-      saveHeroes();
-      populateHeroDropdowns();
-      closeModal('modal-custom-hero');
-      showToast(`เพิ่มฮีโร่ "${name}" เรียบร้อย!`);
-      renderRosterGrid();
-      renderLeaderboard();
-    }
-
-    /* ========================================================
-       8. MATCH LOGGING & MODAL HANDLERS (SAVING TO CLOUD)
-       ======================================================== */
-    function openNewMatchModal() {
-      document.getElementById('form-record-match').reset();
-      populateHeroDropdowns();
-      
-      // Default datetime-local to current local time
-      const dateInput = document.getElementById('match-date-input');
-      if (dateInput) {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        dateInput.value = now.toISOString().slice(0, 16);
-      }
-
-      // Ensure Winner and Loser are different by default
-      const winnerSel = document.getElementById('match-winner-hero');
-      const loserSel = document.getElementById('match-loser-hero');
-      if (winnerSel && loserSel && heroes.length > 1) {
-        winnerSel.selectedIndex = 0;
-        loserSel.selectedIndex = 1;
-      }
-      openModal('modal-record-match');
-    }
-
-    async function handleSaveMatch(e) {
-      e.preventDefault();
-      const winnerHero = document.getElementById('match-winner-hero').value;
-      const loserHero = document.getElementById('match-loser-hero').value;
-
-      if (winnerHero === loserHero) {
-        showToast('ฮีโร่ผู้ชนะและผู้แพ้ต้องไม่ใช่ตัวเดียวกัน!');
-        return;
-      }
-
-      const winnerPlayer = document.getElementById('match-winner-player').value.trim();
-      const winnerHp = document.getElementById('match-winner-hp').value;
-      const winnerFirstTurn = document.getElementById('winner-first-turn').checked;
-      const loserPlayer = document.getElementById('match-loser-player').value.trim();
-      const map = document.getElementById('match-map').value.trim();
-      const notes = document.getElementById('match-notes').value.trim();
-      const dateInputVal = document.getElementById('match-date-input').value;
-      const matchDate = dateInputVal ? new Date(dateInputVal).toISOString() : new Date().toISOString();
-
-      const newMatchId = 'm_' + Date.now();
-      const newMatch = {
-        id: newMatchId,
-        date: matchDate,
-        winnerHero,
-        winnerPlayer,
-        winnerHp: winnerHp ? parseInt(winnerHp) : null,
-        winnerFirstTurn,
-        loserHero,
-        loserPlayer,
-        map: map || 'สนามทั่วไป',
-        notes
-      };
-
-      // Optimistic local update
-      matches = [newMatch, ...matches.filter(m => m.id !== newMatchId)];
-      refreshAllViews();
-      closeModal('modal-record-match');
-
-      // Sync to Cloud Firestore
-      if (isCloudReady && db && auth.currentUser) {
-        try {
-          const { doc, setDoc } = window._fb;
-          const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'matches', newMatchId), newMatch);
-          showToast('บันทึกผลขึ้นคลาวด์เรียบร้อยแล้ว!');
-        } catch(err) {
-          console.error('Error saving match to cloud:', err);
-          showToast('บันทึกสำเร็จในเครื่อง (มีปัญหาในการซิงค์คลาวด์)');
-        }
-      } else {
-        showToast('บันทึกผลการแข่งขันเรียบร้อยแล้ว!');
-      }
     }
 
     async function handleDeleteMatch(id) {
@@ -2287,17 +2662,18 @@
     function exportData() {
       const payload = {
         app: 'UnmatchedTracker',
-        version: 2.0,
+        version: 2.1,
         storageType: 'CloudSync',
         exportedAt: new Date().toISOString(),
         heroes,
+        players,
         matches
       };
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `unmatched_tracker_cloud_backup_${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `unmatched_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -2312,30 +2688,16 @@
       reader.onload = async function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (imported.matches && Array.isArray(imported.matches)) {
-            matches = imported.matches;
-            if (isCloudReady && db && auth.currentUser) {
-              const { doc, setDoc } = window._fb;
-              const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-              for (const m of matches) {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'matches', m.id), m);
-              }
-            }
-          }
-          if (imported.heroes && Array.isArray(imported.heroes)) {
-            heroes = imported.heroes;
-            if (isCloudReady && db && auth.currentUser) {
-              const { doc, setDoc } = window._fb;
-              const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-              for (const h of heroes) {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'heroes', h.id), h);
-              }
-            }
-          }
+          if (imported.matches && Array.isArray(imported.matches)) matches = imported.matches;
+          if (imported.heroes && Array.isArray(imported.heroes)) heroes = imported.heroes;
+          if (imported.players && Array.isArray(imported.players)) players = imported.players;
+
+          saveLocalData();
           populateHeroDropdowns();
+          populatePlayerDropdowns();
           refreshAllViews();
           closeModal('modal-settings');
-          showToast('นำเข้าและซิงค์ข้อมูลขึ้นคลาวด์สำเร็จ!');
+          showToast('นำเข้าข้อมูลสำเร็จ!');
         } catch(err) {
           showToast('ไฟล์ JSON ไม่ถูกต้องหรือไม่ตรงรูปแบบ');
         }
