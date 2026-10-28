@@ -65,14 +65,17 @@
 
   <style>
     /* Global font rendering & readability */
+    html {
+      font-size: 17px;
+    }
     body {
       font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      letter-spacing: 0.01em;
-      line-height: 1.6;
+      letter-spacing: 0.015em;
+      line-height: 1.65;
     }
     h1, h2, h3, h4, .font-title {
       font-family: 'Kanit', sans-serif;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.025em;
     }
 
     /* Custom scrollbar */
@@ -122,22 +125,22 @@
 
       <!-- Desktop Nav Tabs -->
       <nav class="hidden md:flex items-center space-x-1 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-slate-950 shadow-md">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn px-4 py-2 rounded-lg text-base font-semibold flex items-center gap-2 transition-all bg-amber-500 text-slate-950 shadow-md">
           <i data-lucide="layout-grid" class="w-4 h-4"></i> แดชบอร์ด
         </button>
-        <button onclick="switchTab('players')" id="nav-players" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('players')" id="nav-players" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="user-check" class="w-4 h-4"></i> ผู้เล่น & อันดับ
         </button>
-        <button onclick="switchTab('matchups')" id="nav-matchups" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('matchups')" id="nav-matchups" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="crosshair" class="w-4 h-4"></i> วิเคราะห์คู่ต่อสู้ (H2H)
         </button>
-        <button onclick="switchTab('timeline')" id="nav-timeline" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('timeline')" id="nav-timeline" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="calendar" class="w-4 h-4"></i> สรุปตามวัน/เดือน/ปี
         </button>
-        <button onclick="switchTab('history')" id="nav-history" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('history')" id="nav-history" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="history" class="w-4 h-4"></i> ประวัติการสู้
         </button>
-        <button onclick="switchTab('roster')" id="nav-roster" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('roster')" id="nav-roster" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="users" class="w-4 h-4"></i> รายชื่อฮีโร่
         </button>
       </nav>
@@ -145,12 +148,12 @@
       <!-- Action Buttons -->
       <div class="flex items-center space-x-2">
         <!-- Cloud Status Pill -->
-        <div id="cloud-status-pill" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 text-[11px] text-slate-300">
+        <div id="cloud-status-pill" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-slate-300">
           <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
           <span id="cloud-status-text">เชื่อมต่อคลาวด์...</span>
         </div>
 
-        <button onclick="openNewMatchModal()" class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm shadow-lg shadow-amber-500/20 active:scale-95 transition-all">
+        <button onclick="openNewMatchModal()" class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm md:text-base shadow-lg shadow-amber-500/20 active:scale-95 transition-all">
           <i data-lucide="plus-circle" class="w-4 h-4 stroke-[2.5]"></i>
           <span class="hidden sm:inline">บันทึกแมตช์ใหม่</span>
           <span class="sm:hidden">บันทึกผล</span>
@@ -174,49 +177,49 @@
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
           <div class="absolute -right-3 -top-3 w-16 h-16 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition"></div>
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+          <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider">
             <span>แมตช์ทั้งหมด</span>
             <i data-lucide="swords" class="w-4 h-4 text-amber-400"></i>
           </div>
           <div class="mt-3">
-            <span id="stat-total-matches" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
-            <span class="text-xs text-slate-500 ml-1">เกม</span>
+            <span id="stat-total-matches" class="text-3xl sm:text-4xl font-extrabold text-white">0</span>
+            <span class="text-xs sm:text-sm text-slate-500 ml-1">เกม</span>
           </div>
         </div>
 
         <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
           <div class="absolute -right-3 -top-3 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition"></div>
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+          <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider">
             <span>ฮีโร่ที่มีการเล่น</span>
             <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
           </div>
           <div class="mt-3">
-            <span id="stat-active-heroes" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
-            <span class="text-xs text-slate-500 ml-1">ตัวละคร</span>
+            <span id="stat-active-heroes" class="text-3xl sm:text-4xl font-extrabold text-white">0</span>
+            <span class="text-xs sm:text-sm text-slate-500 ml-1">ตัวละคร</span>
           </div>
         </div>
 
         <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
           <div class="absolute -right-3 -top-3 w-16 h-16 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition"></div>
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+          <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider">
             <span>วินเรตสูงสุด (Top Tier)</span>
             <i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>
           </div>
           <div class="mt-3">
-            <div id="stat-top-hero" class="text-sm sm:text-base font-bold text-amber-300 truncate">-</div>
-            <p id="stat-top-hero-sub" class="text-[11px] text-slate-400 mt-0.5">ชนะ 0%</p>
+            <div id="stat-top-hero" class="text-base sm:text-lg font-bold text-amber-300 truncate">-</div>
+            <p id="stat-top-hero-sub" class="text-xs sm:text-sm text-slate-400 mt-0.5">ชนะ 0%</p>
           </div>
         </div>
 
         <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
           <div class="absolute -right-3 -top-3 w-16 h-16 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition"></div>
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+          <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider">
             <span>ความได้เปรียบเดินก่อน</span>
             <i data-lucide="dices" class="w-4 h-4 text-purple-400"></i>
           </div>
           <div class="mt-3">
-            <span id="stat-p1-winrate" class="text-2xl sm:text-3xl font-extrabold text-white">50%</span>
-            <span class="text-xs text-slate-500 ml-1">Turn 1 Winrate</span>
+            <span id="stat-p1-winrate" class="text-3xl sm:text-4xl font-extrabold text-white">50%</span>
+            <span class="text-xs sm:text-sm text-slate-500 ml-1">Turn 1 Winrate</span>
           </div>
         </div>
       </div>
@@ -227,28 +230,28 @@
         <div class="lg:col-span-7 bg-[#0f172a]/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <h2 class="font-title text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
+              <h2 class="font-title text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
                 <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i> อันดับฮีโร่ยอดเยี่ยม (Hero Leaderboard)
               </h2>
-              <p class="text-xs text-slate-400">เรียงตามอัตราการชนะ (ขั้นต่ำ 1 แมตช์ขึ้นไป)</p>
+              <p class="text-xs sm:text-sm text-slate-400">เรียงตามอัตราการชนะ (ขั้นต่ำ 1 แมตช์ขึ้นไป)</p>
             </div>
             <div class="relative">
               <input type="text" id="leaderboard-search" oninput="renderLeaderboard()" placeholder="ค้นหาตัวละคร..." 
-                class="w-full sm:w-44 bg-slate-950/70 border border-slate-800 text-xs rounded-xl px-3 py-1.5 pl-8 focus:outline-none focus:border-amber-500 transition text-slate-200">
-              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5"></i>
+                class="w-full sm:w-48 bg-slate-950/70 border border-slate-800 text-xs sm:text-sm rounded-xl px-3 py-2 pl-8 focus:outline-none focus:border-amber-500 transition text-slate-200">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-3"></i>
             </div>
           </div>
 
           <!-- Table Container -->
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm">
+            <table class="w-full text-left text-sm sm:text-base">
               <thead>
-                <tr class="border-b border-slate-800 text-slate-400 uppercase text-[11px] font-semibold tracking-wider">
-                  <th class="py-2.5 px-3">ฮีโร่</th>
-                  <th class="py-2.5 px-2 text-center">แข่ง</th>
-                  <th class="py-2.5 px-2 text-center text-emerald-400">ชนะ</th>
-                  <th class="py-2.5 px-2 text-center text-rose-400">แพ้</th>
-                  <th class="py-2.5 px-3 text-right">Win Rate</th>
+                <tr class="border-b border-slate-800 text-slate-400 uppercase text-xs sm:text-sm font-semibold tracking-wider">
+                  <th class="py-3 px-3">ฮีโร่</th>
+                  <th class="py-3 px-2 text-center">แข่ง</th>
+                  <th class="py-3 px-2 text-center text-emerald-400">ชนะ</th>
+                  <th class="py-3 px-2 text-center text-rose-400">แพ้</th>
+                  <th class="py-3 px-3 text-right">Win Rate</th>
                 </tr>
               </thead>
               <tbody id="leaderboard-rows" class="divide-y divide-slate-800/60">
@@ -313,6 +316,7 @@
                   <th class="py-2.5 px-2 text-center text-emerald-400">ชนะ</th>
                   <th class="py-2.5 px-2 text-center text-rose-400">แพ้</th>
                   <th class="py-2.5 px-3 text-right">Win Rate</th>
+                  <th class="py-2.5 px-2 text-center">จัดการ</th>
                 </tr>
               </thead>
               <tbody id="player-leaderboard-rows" class="divide-y divide-slate-800/60">
@@ -339,13 +343,36 @@
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
             <i data-lucide="crosshair" class="w-3.5 h-3.5"></i> HEAD-TO-HEAD DOSSIER
           </span>
-          <h2 class="font-title text-xl sm:text-2xl font-black text-slate-100">เลือกฮีโร่เพื่อดูสถิติเจาะจง</h2>
-          <p class="text-xs sm:text-sm text-slate-400">วิเคราะห์ว่าฮีโร่ตัวโปรดของคุณ ชนะหรือแพ้ใครมาแล้วบ้าง ชนะด้วยอัตราเท่าไหร่</p>
+          <h2 class="font-title text-xl sm:text-2xl font-black text-slate-100">เลือกหรือค้นหาฮีโร่เพื่อดูสถิติเจาะจง</h2>
+          <p class="text-xs sm:text-sm text-slate-400">พิมพ์ค้นหาหรือเลือกฮีโร่ตัวโปรดของคุณ เพื่อดูว่าชนะหรือแพ้ใครมาแล้วบ้าง</p>
           
-          <div class="pt-2">
-            <select id="h2h-hero-selector" onchange="renderH2HDossier()" class="w-full max-w-md mx-auto bg-slate-950 border-2 border-amber-500/50 hover:border-amber-400 rounded-xl px-4 py-2.5 text-sm font-bold text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition">
-              <!-- Options populated by JS -->
-            </select>
+          <!-- Searchable Hero Combobox Container -->
+          <div class="pt-2 relative max-w-md mx-auto text-left" id="h2h-search-container">
+            <div class="relative">
+              <input type="text" 
+                     id="h2h-hero-search-input" 
+                     placeholder="🔍 พิมพ์ชื่อฮีโร่หรือชื่อกล่อง เช่น Medusa, Arthur..." 
+                     autocomplete="off"
+                     oninput="handleH2HSearchInput(event)"
+                     onfocus="openH2HDropdown()"
+                     class="w-full bg-slate-950 border-2 border-amber-500/50 focus:border-amber-400 rounded-xl px-4 py-2.5 pl-10 text-sm font-bold text-amber-300 placeholder:text-slate-500 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition shadow-lg">
+              <i data-lucide="search" class="w-4 h-4 text-amber-400/80 absolute left-3.5 top-3.5 pointer-events-none"></i>
+              <button type="button" 
+                      id="h2h-clear-search-btn" 
+                      onclick="clearH2HSearch()" 
+                      class="hidden absolute right-3 top-2.5 p-1 text-slate-400 hover:text-white rounded-md hover:bg-slate-800 transition">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+            <!-- Custom Floating Dropdown Menu -->
+            <div id="h2h-hero-dropdown-menu" 
+                 class="hidden absolute left-0 right-0 top-full mt-2 bg-slate-950/95 backdrop-blur-xl border border-amber-500/30 rounded-2xl shadow-2xl z-30 max-h-64 overflow-y-auto divide-y divide-slate-800/60 transition-all">
+              <!-- Populated via JS -->
+            </div>
+
+            <!-- Hidden input holding current selected heroId -->
+            <input type="hidden" id="h2h-selected-hero-id" value="">
           </div>
         </div>
       </div>
@@ -464,30 +491,30 @@
   </main>
 
   <!-- MOBILE BOTTOM NAVIGATION BAR -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a1020]/95 backdrop-blur-lg border-t border-slate-800/90 px-2 py-2 flex items-center justify-around">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a1020]/95 backdrop-blur-lg border-t border-slate-800/90 px-2 py-2.5 flex items-center justify-around">
     <button onclick="switchTab('dashboard')" id="mob-dashboard" class="flex flex-col items-center gap-1 text-amber-400">
-      <i data-lucide="layout-grid" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">แดชบอร์ด</span>
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[11px] font-bold">แดชบอร์ด</span>
     </button>
     <button onclick="switchTab('players')" id="mob-players" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="user-check" class="w-4 h-4"></i>
-      <span class="text-[9px] font-medium">ผู้เล่น</span>
+      <i data-lucide="user-check" class="w-5 h-5"></i>
+      <span class="text-[11px] font-medium">ผู้เล่น</span>
     </button>
     <button onclick="switchTab('matchups')" id="mob-matchups" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="crosshair" class="w-4 h-4"></i>
-      <span class="text-[9px] font-medium">H2H</span>
+      <i data-lucide="crosshair" class="w-5 h-5"></i>
+      <span class="text-[11px] font-medium">H2H</span>
     </button>
     <button onclick="switchTab('timeline')" id="mob-timeline" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="calendar" class="w-4 h-4"></i>
-      <span class="text-[9px] font-medium">ไทม์ไลน์</span>
+      <i data-lucide="calendar" class="w-5 h-5"></i>
+      <span class="text-[11px] font-medium">ไทม์ไลน์</span>
     </button>
     <button onclick="switchTab('history')" id="mob-history" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="history" class="w-4 h-4"></i>
-      <span class="text-[9px] font-medium">ประวัติ</span>
+      <i data-lucide="history" class="w-5 h-5"></i>
+      <span class="text-[11px] font-medium">ประวัติ</span>
     </button>
     <button onclick="switchTab('roster')" id="mob-roster" class="flex flex-col items-center gap-1 text-slate-400">
-      <i data-lucide="users" class="w-4 h-4"></i>
-      <span class="text-[9px] font-medium">ฮีโร่</span>
+      <i data-lucide="users" class="w-5 h-5"></i>
+      <span class="text-[11px] font-medium">ฮีโร่</span>
     </button>
   </nav>
 
@@ -573,24 +600,52 @@
         <!-- DATE & TIME FIELD -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">วันและเวลาที่แข่งขัน (Match Date & Time)</label>
-            <input type="datetime-local" id="match-date-input" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-amber-500 focus:outline-none">
+            <div class="flex items-center justify-between mb-1">
+              <label for="match-date-input" class="block text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <i data-lucide="calendar-clock" class="w-3.5 h-3.5 text-amber-400"></i> วันและเวลาที่แข่ง *
+              </label>
+              <button type="button" onclick="setCurrentDateTimeToInput()" class="text-[10px] text-amber-400 hover:text-amber-300 underline">
+                ใช้วันเวลานี้
+              </button>
+            </div>
+            <div class="relative">
+              <input type="datetime-local" id="match-date-input" required class="w-full bg-slate-950 border border-slate-700 hover:border-amber-500/60 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer">
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">แตะเพื่อเลือกวัน เดือน ปี และเวลาแข่ง</p>
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">สนามรบ / แผนที่ (Battlefield Map)</label>
-            <input type="text" id="match-map" list="map-suggestions" placeholder="เช่น Sarpedon, Baskerville..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-amber-500 focus:outline-none">
+            <label for="match-map" class="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i> สนามรบ / แผนที่ (Battlefield Map)
+            </label>
+            <input type="text" id="match-map" list="map-suggestions" placeholder="พิมพ์เลขโรมัน เช่น I, V หรือชื่อแมพ..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:border-amber-500 focus:outline-none transition">
             <datalist id="map-suggestions">
-              <option value="Sarpedon"></option>
-              <option value="Baskerville Manor"></option>
-              <option value="Sherwood Forest"></option>
-              <option value="Raptor Paddock"></option>
-              <option value="Yukon"></option>
-              <option value="Soho"></option>
-              <option value="Marmoreal"></option>
-              <option value="Hanging Gardens"></option>
-              <option value="Navy Yard"></option>
-              <option value="Sanctum Sanctorum"></option>
-              <option value="Helicarrier"></option>
+              <!-- European / IELLO Roman Numeral Maps -->
+              <option value="I - Sarpedon (BoL Vol. 1)"></option>
+              <option value="II - Marmoreal (BoL Vol. 1)"></option>
+              <option value="III - Sherwood Forest (Robin vs Bigfoot)"></option>
+              <option value="IV - Yukon (Robin vs Bigfoot)"></option>
+              <option value="V - Baskerville Manor (Cobble & Fog)"></option>
+              <option value="VI - Soho (Cobble & Fog)"></option>
+              <option value="VII - Heorot (Little Red vs Beowulf)"></option>
+              <option value="VIII - Hanging Gardens (BoL Vol. 2)"></option>
+              <option value="IX - King Solomon's Mine (Houdini vs Genie)"></option>
+              <option value="X - Azuchi Castle (Sun's Origin)"></option>
+              <option value="XI - Kaer Morhen (Witcher: Steel & Silver)"></option>
+              <option value="XII - Fayrlund Forest (Witcher: Steel & Silver)"></option>
+              <option value="XIII - Streets of Novigrad (Witcher: Realms Fall)"></option>
+              <option value="XIV - Naglfar (Witcher: Realms Fall)"></option>
+              
+              <!-- Adventures & IP / Other Sets -->
+              <option value="Point Pleasant (Tales to Amaze)"></option>
+              <option value="McMinnville (Tales to Amaze)"></option>
+              <option value="Globe Theatre (Slings and Arrows)"></option>
+              <option value="Raptor Paddock (Jurassic Park)"></option>
+              <option value="T. Rex Paddock (Jurassic Park)"></option>
+              <option value="Sanctum Sanctorum (Marvel)"></option>
+              <option value="Helicarrier (Marvel)"></option>
+              <option value="Hell's Kitchen (Marvel)"></option>
+              <option value="The Raft (Marvel)"></option>
+              <option value="Navy Pier (Teen Spirit)"></option>
             </datalist>
           </div>
         </div>
@@ -673,6 +728,44 @@
           <button type="submit" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg">บันทึกชื่อผู้เล่น</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- 2.6 CONFIRM DELETE PLAYER MODAL (CUSTOM MODAL REPLACING WINDOW.CONFIRM) -->
+  <div id="modal-delete-player-confirm" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[#0f172a] border border-rose-500/40 w-full max-w-sm rounded-2xl shadow-2xl p-5 relative space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30 shrink-0">
+          <i data-lucide="trash-2" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-title font-bold text-base text-white">ยืนยันการลบผู้เล่น</h3>
+          <p class="text-xs text-rose-400 font-semibold" id="delete-player-target-name">-</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        คุณต้องการลบรายชื่อผู้เล่นนี้ออกจากระบบใช่หรือไม่? กรุณาเลือกรูปแบบที่ต้องการจัดการ:
+      </p>
+
+      <div class="space-y-2 pt-1">
+        <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-900 border border-slate-800 cursor-pointer hover:border-slate-700">
+          <input type="checkbox" id="delete-player-cascade-matches" class="mt-0.5 rounded bg-slate-950 border-slate-700 text-rose-500 focus:ring-0">
+          <div class="text-[11px]">
+            <span class="font-bold text-slate-200 block">ลบประวัติการแข่งของคนนี้ทิ้งด้วย</span>
+            <span class="text-slate-400 text-[10px]">หากไม่ติ๊ก ชื่ออาจจะยังปรากฏในประวัติแมตช์เดิม</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2">
+        <button type="button" onclick="closeModal('modal-delete-player-confirm')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800">
+          ยกเลิก
+        </button>
+        <button type="button" onclick="executeDeletePlayer()" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/20">
+          ยืนยันการลบ
+        </button>
+      </div>
     </div>
   </div>
 
@@ -918,9 +1011,21 @@
       { id: 'dr-sattler', name: 'Dr. Ellie Sattler', set: 'Jurassic Park - T-Rex vs Ellie', color: '#c084fc' },
       { id: 'beowulf', name: 'Beowulf', set: 'Little Red vs Beowulf', color: '#6366f1' },
       { id: 'little-red', name: 'Little Red Riding Hood', set: 'Little Red vs Beowulf', color: '#f43f5e' },
-      { id: 'golden-bat', name: 'Golden Bat', set: 'Tales to Amaze', color: '#facc15' },
       { id: 'oda-nobunaga', name: 'Oda Nobunaga', set: 'Sun’s Origin', color: '#991b1b' },
-      { id: 'tomoe-gozen', name: 'Tomoe Gozen', set: 'Sun’s Origin', color: '#06b6d4' }
+      { id: 'tomoe-gozen', name: 'Tomoe Gozen', set: 'Sun’s Origin', color: '#06b6d4' },
+      // Tales to Amaze
+      { id: 'golden-bat', name: 'Golden Bat', set: 'Tales to Amaze', color: '#facc15' },
+      { id: 'nikola-tesla', name: 'Nikola Tesla', set: 'Tales to Amaze', color: '#38bdf8' },
+      { id: 'annie-christmas', name: 'Annie Christmas', set: 'Tales to Amaze', color: '#fb923c' },
+      { id: 'dr-jill-trent', name: 'Dr. Jill Trent', set: 'Tales to Amaze', color: '#a3e635' },
+      // The Witcher: Steel & Silver
+      { id: 'geralt-of-rivia', name: 'Geralt of Rivia', set: 'The Witcher: Steel & Silver', color: '#e2e8f0' },
+      { id: 'ciri', name: 'Ciri', set: 'The Witcher: Steel & Silver', color: '#2dd4bf' },
+      { id: 'ancient-leshen', name: 'Ancient Leshen', set: 'The Witcher: Steel & Silver', color: '#854d0e' },
+      // The Witcher: Realms Fall
+      { id: 'yennefer-triss', name: 'Yennefer & Triss', set: 'The Witcher: Realms Fall', color: '#c084fc' },
+      { id: 'philippa-eilhart', name: 'Philippa Eilhart', set: 'The Witcher: Realms Fall', color: '#fbbf24' },
+      { id: 'eredin', name: 'Eredin', set: 'The Witcher: Realms Fall', color: '#64748b' }
     ];
 
     const SAMPLE_MATCHES = [
@@ -1204,7 +1309,22 @@
       const localMatches = localStorage.getItem('unmatched_local_matches');
 
       players = localPlayers ? JSON.parse(localPlayers) : [...DEFAULT_PLAYERS];
-      heroes = localHeroes ? JSON.parse(localHeroes) : [...DEFAULT_HEROES];
+
+      if (localHeroes) {
+        try {
+          const parsedHeroes = JSON.parse(localHeroes);
+          // Auto-merge newly added default heroes into existing local storage
+          const heroMap = new Map();
+          DEFAULT_HEROES.forEach(h => heroMap.set(h.id, h));
+          parsedHeroes.forEach(h => heroMap.set(h.id, h)); // Preserve user custom heroes / edits
+          heroes = Array.from(heroMap.values());
+        } catch(e) {
+          heroes = [...DEFAULT_HEROES];
+        }
+      } else {
+        heroes = [...DEFAULT_HEROES];
+      }
+
       matches = localMatches ? JSON.parse(localMatches) : [...SAMPLE_MATCHES];
 
       populateHeroDropdowns();
@@ -1341,14 +1461,9 @@
         const winName = (m.winnerPlayer || '').trim();
         const loseName = (m.loserPlayer || '').trim();
 
-        if (winName) {
+        // Calculate only if player is in registered players list
+        if (winName && stats[winName.toLowerCase()]) {
           const keyW = winName.toLowerCase();
-          if (!stats[keyW]) {
-            stats[keyW] = {
-              player: { id: keyW, name: winName, tagline: '' },
-              matches: 0, wins: 0, losses: 0, winrate: 0, heroUsage: {}, opponents: {}
-            };
-          }
           stats[keyW].matches++;
           stats[keyW].wins++;
 
@@ -1369,14 +1484,8 @@
           }
         }
 
-        if (loseName) {
+        if (loseName && stats[loseName.toLowerCase()]) {
           const keyL = loseName.toLowerCase();
-          if (!stats[keyL]) {
-            stats[keyL] = {
-              player: { id: keyL, name: loseName, tagline: '' },
-              matches: 0, wins: 0, losses: 0, winrate: 0, heroUsage: {}, opponents: {}
-            };
-          }
           stats[keyL].matches++;
           stats[keyL].losses++;
 
@@ -1429,29 +1538,34 @@
         const medal = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `${idx + 1}`));
 
         return `
-          <tr class="hover:bg-slate-800/40 transition cursor-pointer group" onclick="jumpToPlayer('${p.id || p.name}')">
-            <td class="py-3 px-3">
+          <tr class="hover:bg-slate-800/40 transition group">
+            <td class="py-3 px-3 cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">
               <div class="flex items-center gap-2.5">
-                <span class="w-6 text-center text-xs font-bold text-slate-400">${medal}</span>
-                <div class="w-8 h-8 rounded-full bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center font-bold text-indigo-300 shrink-0 text-xs">
+                <span class="w-6 text-center text-sm font-bold text-slate-400">${medal}</span>
+                <div class="w-9 h-9 rounded-full bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center font-bold text-indigo-300 shrink-0 text-sm">
                   ${p.name.charAt(0).toUpperCase()}
                 </div>
                 <div class="truncate">
-                  <span class="font-bold text-slate-100 group-hover:text-amber-400 transition">${p.name}</span>
-                  <p class="text-[10px] text-slate-500 truncate">${p.tagline || 'สมาชิกในก๊วน'}</p>
+                  <span class="font-bold text-slate-100 group-hover:text-amber-400 transition text-sm sm:text-base">${p.name}</span>
+                  <p class="text-xs text-slate-400 truncate">${p.tagline || 'สมาชิกในก๊วน'}</p>
                 </div>
               </div>
             </td>
-            <td class="py-3 px-2 text-center font-semibold text-slate-300">${item.matches}</td>
-            <td class="py-3 px-2 text-center font-bold text-emerald-400">${item.wins}</td>
-            <td class="py-3 px-2 text-center font-bold text-rose-400">${item.losses}</td>
-            <td class="py-3 px-3 text-right">
+            <td class="py-3 px-2 text-center font-semibold text-slate-300 text-sm sm:text-base cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">${item.matches}</td>
+            <td class="py-3 px-2 text-center font-bold text-emerald-400 text-sm sm:text-base cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">${item.wins}</td>
+            <td class="py-3 px-2 text-center font-bold text-rose-400 text-sm sm:text-base cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">${item.losses}</td>
+            <td class="py-3 px-3 text-right cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">
               <div class="inline-flex flex-col items-end">
-                <span class="font-black ${wrColor}">${item.matches > 0 ? item.winrate + '%' : '-'}</span>
-                <div class="w-16 bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
+                <span class="font-black text-sm sm:text-base ${wrColor}">${item.matches > 0 ? item.winrate + '%' : '-'}</span>
+                <div class="w-20 bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                   <div class="bg-indigo-500 h-full rounded-full" style="width: ${item.winrate}%"></div>
                 </div>
               </div>
+            </td>
+            <td class="py-3 px-2 text-center">
+              <button onclick="handleDeletePlayer('${p.id || p.name}', '${p.name}')" title="ลบผู้เล่น ${p.name}" class="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
             </td>
           </tr>
         `;
@@ -1521,11 +1635,18 @@
               </div>
             </div>
 
-            <!-- Stats Badge -->
-            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-center min-w-[90px]">
-              <span class="text-[10px] uppercase font-bold text-slate-400">WIN RATE</span>
-              <p class="text-xl font-black ${pStat.winrate >= 50 ? 'text-emerald-400' : 'text-rose-400'}">${pStat.matches > 0 ? pStat.winrate + '%' : '-'}</p>
-              <p class="text-[10px] text-slate-500">${pStat.wins}W - ${pStat.losses}L</p>
+            <div class="flex items-center gap-3">
+              <!-- Stats Badge -->
+              <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-center min-w-[90px]">
+                <span class="text-[10px] uppercase font-bold text-slate-400">WIN RATE</span>
+                <p class="text-xl font-black ${pStat.winrate >= 50 ? 'text-emerald-400' : 'text-rose-400'}">${pStat.matches > 0 ? pStat.winrate + '%' : '-'}</p>
+                <p class="text-[10px] text-slate-500">${pStat.wins}W - ${pStat.losses}L</p>
+              </div>
+
+              <!-- Delete Player Button -->
+              <button onclick="handleDeletePlayer('${playerObj.id}', '${playerObj.name}')" title="ลบผู้เล่นนี้ออกจากรายชื่อ" class="p-2.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/30 rounded-xl transition">
+                <i data-lucide="user-x" class="w-5 h-5"></i>
+              </button>
             </div>
           </div>
 
@@ -1632,6 +1753,56 @@
 
       renderPlayerLeaderboard();
       renderPlayerProfile();
+    }
+
+    // Pending player deletion storage
+    let pendingDeletePlayerInfo = null;
+
+    function handleDeletePlayer(playerId, playerName) {
+      pendingDeletePlayerInfo = { playerId, playerName };
+      const nameEl = document.getElementById('delete-player-target-name');
+      const chk = document.getElementById('delete-player-cascade-matches');
+      if (nameEl) nameEl.innerText = `ผู้เล่น: ${playerName}`;
+      if (chk) chk.checked = false;
+      openModal('modal-delete-player-confirm');
+    }
+
+    async function executeDeletePlayer() {
+      if (!pendingDeletePlayerInfo) return;
+      const { playerId, playerName } = pendingDeletePlayerInfo;
+      const deleteMatchesToo = document.getElementById('delete-player-cascade-matches')?.checked;
+
+      // 1. Remove from players list
+      players = players.filter(p => p.id !== playerId && p.name.toLowerCase() !== playerName.toLowerCase());
+
+      // 2. If user selected to cascade delete matches, remove matches with this player
+      if (deleteMatchesToo) {
+        matches = matches.filter(m => 
+          (m.winnerPlayer || '').toLowerCase() !== playerName.toLowerCase() &&
+          (m.loserPlayer || '').toLowerCase() !== playerName.toLowerCase()
+        );
+      }
+
+      saveLocalData();
+      populatePlayerDropdowns();
+
+      // 3. Cloud deletion if active
+      if (isCloudReady && db && auth.currentUser) {
+        try {
+          const { doc, deleteDoc } = window._fb;
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
+          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', playerId));
+        } catch(err) {
+          console.warn('Could not delete player from cloud', err);
+        }
+      }
+
+      closeModal('modal-delete-player-confirm');
+      pendingDeletePlayerInfo = null;
+      showToast(`ลบผู้เล่น "${playerName}" สำเร็จแล้ว`);
+      renderPlayerLeaderboard();
+      renderPlayerProfile();
+      refreshAllViews();
     }
 
     function computeHeroStats() {
@@ -1742,25 +1913,25 @@
 
         return `
           <tr class="hover:bg-slate-800/40 transition cursor-pointer group" onclick="jumpToH2H('${h.id}')">
-            <td class="py-2.5 px-3">
+            <td class="py-3 px-3">
               <div class="flex items-center gap-2.5">
-                <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold ${badgeBg}">
+                <span class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold ${badgeBg}">
                   ${idx + 1}
                 </span>
-                <div class="w-3 h-3 rounded-full shrink-0" style="background-color: ${h.color}"></div>
+                <div class="w-3.5 h-3.5 rounded-full shrink-0" style="background-color: ${h.color}"></div>
                 <div class="truncate">
-                  <span class="font-bold text-slate-100 group-hover:text-amber-400 transition">${h.name}</span>
-                  <p class="text-[10px] text-slate-500 truncate max-w-[150px] sm:max-w-none">${h.set}</p>
+                  <span class="font-bold text-slate-100 group-hover:text-amber-400 transition text-sm sm:text-base">${h.name}</span>
+                  <p class="text-xs text-slate-400 truncate max-w-[150px] sm:max-w-none">${h.set}</p>
                 </div>
               </div>
             </td>
-            <td class="py-2.5 px-2 text-center font-semibold text-slate-300">${item.matches}</td>
-            <td class="py-2.5 px-2 text-center font-bold text-emerald-400">${item.wins}</td>
-            <td class="py-2.5 px-2 text-center font-bold text-rose-400">${item.losses}</td>
-            <td class="py-2.5 px-3 text-right">
+            <td class="py-3 px-2 text-center font-semibold text-slate-300 text-sm sm:text-base">${item.matches}</td>
+            <td class="py-3 px-2 text-center font-bold text-emerald-400 text-sm sm:text-base">${item.wins}</td>
+            <td class="py-3 px-2 text-center font-bold text-rose-400 text-sm sm:text-base">${item.losses}</td>
+            <td class="py-3 px-3 text-right">
               <div class="inline-flex flex-col items-end">
-                <span class="font-black ${wrColor}">${item.matches > 0 ? item.winrate + '%' : '-'}</span>
-                <div class="w-16 bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
+                <span class="font-black text-sm sm:text-base ${wrColor}">${item.matches > 0 ? item.winrate + '%' : '-'}</span>
+                <div class="w-20 bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                   <div class="bg-amber-500 h-full rounded-full" style="width: ${item.winrate}%"></div>
                 </div>
               </div>
@@ -1841,7 +2012,6 @@
     function populateHeroDropdowns() {
       const matchWinnerSelect = document.getElementById('match-winner-hero');
       const matchLoserSelect = document.getElementById('match-loser-hero');
-      const h2hSelect = document.getElementById('h2h-hero-selector');
 
       const sortedHeroes = [...heroes].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -1849,24 +2019,136 @@
 
       if (matchWinnerSelect) matchWinnerSelect.innerHTML = optionsHtml;
       if (matchLoserSelect) matchLoserSelect.innerHTML = optionsHtml;
-      if (h2hSelect) {
-        h2hSelect.innerHTML = sortedHeroes.map(h => `<option value="${h.id}">⚔️ ข้อมูลการสู้ของ: ${h.name}</option>`).join('');
+
+      // Set default selected hero for H2H if empty
+      const hiddenInput = document.getElementById('h2h-selected-hero-id');
+      const searchInput = document.getElementById('h2h-hero-search-input');
+      if (hiddenInput && (!hiddenInput.value || !getHero(hiddenInput.value))) {
+        const defaultHero = sortedHeroes[0] || heroes[0];
+        if (defaultHero) {
+          hiddenInput.value = defaultHero.id;
+          if (searchInput) searchInput.value = `${defaultHero.name} (${defaultHero.set})`;
+        }
       }
     }
+
+    // --- Searchable H2H Hero Selector Methods ---
+    function openH2HDropdown() {
+      renderH2HDropdownList();
+      const menu = document.getElementById('h2h-hero-dropdown-menu');
+      if (menu) menu.classList.remove('hidden');
+    }
+
+    function closeH2HDropdown() {
+      const menu = document.getElementById('h2h-hero-dropdown-menu');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    function handleH2HSearchInput(e) {
+      const query = e.target.value.trim().toLowerCase();
+      const clearBtn = document.getElementById('h2h-clear-search-btn');
+      if (clearBtn) {
+        if (query.length > 0) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+      openH2HDropdown();
+      renderH2HDropdownList(query);
+    }
+
+    function clearH2HSearch() {
+      const input = document.getElementById('h2h-hero-search-input');
+      const clearBtn = document.getElementById('h2h-clear-search-btn');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      if (clearBtn) clearBtn.classList.add('hidden');
+      renderH2HDropdownList('');
+    }
+
+    function renderH2HDropdownList(query = '') {
+      const menu = document.getElementById('h2h-hero-dropdown-menu');
+      if (!menu) return;
+
+      const q = query.toLowerCase();
+      const filtered = heroes.filter(h => 
+        h.name.toLowerCase().includes(q) || (h.set && h.set.toLowerCase().includes(q))
+      );
+
+      // Sort alphabetically
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+      if (filtered.length === 0) {
+        menu.innerHTML = `
+          <div class="p-4 text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-1">
+            <i data-lucide="help-circle" class="w-4 h-4 text-slate-600"></i>
+            <span>ไม่พบฮีโร่ที่ชื่อ "${query}"</span>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      const currentSelected = document.getElementById('h2h-selected-hero-id')?.value;
+
+      menu.innerHTML = filtered.map(h => {
+        const isSelected = h.id === currentSelected;
+        return `
+          <div onclick="selectH2HHero('${h.id}')" 
+               class="px-3.5 py-2.5 flex items-center justify-between hover:bg-slate-800/80 cursor-pointer transition ${isSelected ? 'bg-amber-500/10 border-l-4 border-amber-500' : ''}">
+            <div class="flex items-center gap-2.5 truncate">
+              <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" style="background-color: ${h.color}"></span>
+              <div class="truncate">
+                <span class="text-xs font-bold ${isSelected ? 'text-amber-400' : 'text-slate-200'}">${h.name}</span>
+                <p class="text-[10px] text-slate-500 truncate">${h.set || 'Unmatched'}</p>
+              </div>
+            </div>
+            ${isSelected ? '<i data-lucide="check" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>' : ''}
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function selectH2HHero(heroId) {
+      const hero = getHero(heroId);
+      const hiddenInput = document.getElementById('h2h-selected-hero-id');
+      const searchInput = document.getElementById('h2h-hero-search-input');
+      const clearBtn = document.getElementById('h2h-clear-search-btn');
+
+      if (hiddenInput) hiddenInput.value = heroId;
+      if (searchInput) searchInput.value = `${hero.name} (${hero.set})`;
+      if (clearBtn) clearBtn.classList.remove('hidden');
+
+      closeH2HDropdown();
+      renderH2HDossier();
+    }
+
+    // Close H2H dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const container = document.getElementById('h2h-search-container');
+      if (container && !container.contains(event.target)) {
+        closeH2HDropdown();
+      }
+    });
 
     function jumpToH2H(heroId) {
       switchTab('matchups');
-      const selector = document.getElementById('h2h-hero-selector');
-      if (selector) {
-        selector.value = heroId;
-        renderH2HDossier();
-      }
+      selectH2HHero(heroId);
     }
 
     function renderH2HDossier() {
-      const selector = document.getElementById('h2h-hero-selector');
-      if (!selector) return;
-      const heroId = selector.value || (heroes[0] ? heroes[0].id : null);
+      const hiddenInput = document.getElementById('h2h-selected-hero-id');
+      let heroId = hiddenInput ? hiddenInput.value : null;
+
+      if (!heroId && heroes.length > 0) {
+        heroId = heroes[0].id;
+        if (hiddenInput) hiddenInput.value = heroId;
+        const searchInput = document.getElementById('h2h-hero-search-input');
+        if (searchInput) searchInput.value = `${heroes[0].name} (${heroes[0].set})`;
+      }
+
       if (!heroId) return;
 
       const container = document.getElementById('h2h-dossier-content');
@@ -2508,17 +2790,29 @@
     /* ========================================================
        8. MATCH LOGGING & MODAL HANDLERS
        ======================================================== */
+    function formatDateTimeLocal(date) {
+      const pad = (n) => String(n).padStart(2, '0');
+      const year = date.getFullYear();
+      const month = pad(date.getMonth() + 1);
+      const day = pad(date.getDate());
+      const hours = pad(date.getHours());
+      const minutes = pad(date.getMinutes());
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    function setCurrentDateTimeToInput() {
+      const dateInput = document.getElementById('match-date-input');
+      if (dateInput) {
+        dateInput.value = formatDateTimeLocal(new Date());
+      }
+    }
+
     function openNewMatchModal() {
       document.getElementById('form-record-match').reset();
       populateHeroDropdowns();
       
-      // Default datetime-local to current local time
-      const dateInput = document.getElementById('match-date-input');
-      if (dateInput) {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        dateInput.value = now.toISOString().slice(0, 16);
-      }
+      // Default datetime-local to current device local time
+      setCurrentDateTimeToInput();
 
       // Ensure Winner and Loser are different by default
       const winnerSel = document.getElementById('match-winner-hero');
