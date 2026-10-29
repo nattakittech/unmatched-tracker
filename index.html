@@ -1312,7 +1312,7 @@
     function renderHeroAvatar(hero, sizeClass = 'w-10 h-10', textClass = 'text-base font-bold') {
       if (hero.imageUrl) {
         return `
-          <div class="${sizeClass} rounded-xl overflow-hidden shrink-0 border border-white/20 bg-slate-800 shadow">
+          <div class="${sizeClass} rounded-xl overflow-hidden shrink-0 border border-white/30 bg-slate-800 shadow">
             <img src="${hero.imageUrl}" alt="${hero.name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.parentElement.outerHTML='<div class=\\'${sizeClass} rounded-xl flex items-center justify-center text-white ${textClass} shrink-0 shadow\\' style=\\'background-color:${hero.color}\\'>${hero.name.charAt(0)}</div>';">
           </div>
         `;
