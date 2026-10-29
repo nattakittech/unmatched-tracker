@@ -1,70 +1,42 @@
 <!DOCTYPE html>
-<html lang="th" class="dark">
+<html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unmatched Battle Tracker & Matchup Matrix</title>
+  <title>Unmatched Battle Tracker - H2H Combat Dossier</title>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
+
+  <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts: Kanit & Sarabun (อ่านง่าย สบายตา ทั้งไทยและอังกฤษ) -->
+
+  <!-- Google Fonts: Kanit (Headings) & Sarabun (Body & Numbers) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800;900&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Firebase Modular SDK Scripts -->
+  <!-- Firebase Modular SDK via ESM -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDocs, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Setup global references for app integration
     window._fb = {
       initializeApp,
       getAuth,
-      signInWithCustomToken,
       signInAnonymously,
-      onAuthStateChanged,
       getFirestore,
+      collection,
       doc,
       setDoc,
-      getDocs,
-      onSnapshot,
-      collection,
-      deleteDoc
+      deleteDoc,
+      onSnapshot
     };
-
-    // Dispatch event to indicate Firebase SDKs are loaded
-    window.dispatchEvent(new CustomEvent('firebase-sdk-ready'));
-  </script>
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            title: ['Kanit', 'sans-serif'],
-            sans: ['Sarabun', 'sans-serif'],
-          },
-          colors: {
-            unmatched: {
-              gold: '#f59e0b',
-              amber: '#d97706',
-              dark: '#0a0f1d',
-              card: '#131b2e',
-              border: '#1e293b',
-              accent: '#e11d48',
-            }
-          }
-        }
-      }
-    }
+    window.dispatchEvent(new Event('firebase-sdk-ready'));
   </script>
 
   <style>
-    /* Global font rendering & readability */
     html {
       font-size: 17px;
     }
@@ -77,8 +49,6 @@
       font-family: 'Kanit', sans-serif;
       letter-spacing: 0.025em;
     }
-
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -93,16 +63,9 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #475569;
     }
-    /* Subtle glow utilities */
-    .glow-gold {
-      box-shadow: 0 0 20px -5px rgba(245, 158, 11, 0.25);
-    }
-    .glow-crimson {
-      box-shadow: 0 0 20px -5px rgba(225, 29, 72, 0.3);
-    }
   </style>
 </head>
-<body class="bg-[#080d1a] text-slate-100 min-h-screen font-sans selection:bg-amber-500 selection:text-slate-950 pb-24 md:pb-12">
+<body class="bg-[#080d1a] text-slate-100 min-h-screen selection:bg-amber-500 selection:text-slate-950 pb-24 md:pb-12">
 
   <!-- TOP NAVIGATION HEADER -->
   <header class="sticky top-0 z-40 bg-[#0a1020]/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3.5 transition-all">
@@ -125,35 +88,34 @@
 
       <!-- Desktop Nav Tabs -->
       <nav class="hidden md:flex items-center space-x-1 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn px-4 py-2 rounded-lg text-base font-semibold flex items-center gap-2 transition-all bg-amber-500 text-slate-950 shadow-md">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-slate-950 shadow-md">
           <i data-lucide="layout-grid" class="w-4 h-4"></i> แดชบอร์ด
         </button>
-        <button onclick="switchTab('players')" id="nav-players" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('players')" id="nav-players" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="user-check" class="w-4 h-4"></i> ผู้เล่น & อันดับ
         </button>
-        <button onclick="switchTab('matchups')" id="nav-matchups" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('matchups')" id="nav-matchups" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="crosshair" class="w-4 h-4"></i> วิเคราะห์คู่ต่อสู้ (H2H)
         </button>
-        <button onclick="switchTab('timeline')" id="nav-timeline" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('timeline')" id="nav-timeline" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="calendar" class="w-4 h-4"></i> สรุปตามวัน/เดือน/ปี
         </button>
-        <button onclick="switchTab('history')" id="nav-history" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('history')" id="nav-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="history" class="w-4 h-4"></i> ประวัติการสู้
         </button>
-        <button onclick="switchTab('roster')" id="nav-roster" class="tab-btn px-4 py-2 rounded-lg text-base font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
+        <button onclick="switchTab('roster')" id="nav-roster" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all">
           <i data-lucide="users" class="w-4 h-4"></i> รายชื่อฮีโร่
         </button>
       </nav>
 
       <!-- Action Buttons -->
       <div class="flex items-center space-x-2">
-        <!-- Cloud Status Pill -->
         <div id="cloud-status-pill" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-slate-300">
-          <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-          <span id="cloud-status-text">เชื่อมต่อคลาวด์...</span>
+          <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+          <span id="cloud-status-text">ออฟไลน์ (ในเครื่อง)</span>
         </div>
 
-        <button onclick="openNewMatchModal()" class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm md:text-base shadow-lg shadow-amber-500/20 active:scale-95 transition-all">
+        <button onclick="openNewMatchModal()" class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs md:text-sm shadow-lg shadow-amber-500/20 active:scale-95 transition-all">
           <i data-lucide="plus-circle" class="w-4 h-4 stroke-[2.5]"></i>
           <span class="hidden sm:inline">บันทึกแมตช์ใหม่</span>
           <span class="sm:hidden">บันทึกผล</span>
@@ -173,10 +135,8 @@
 
     <!-- 1. DASHBOARD VIEW -->
     <section id="view-dashboard" class="space-y-6">
-      <!-- Quick Metric Banners -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
-          <div class="absolute -right-3 -top-3 w-16 h-16 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition"></div>
+        <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between">
           <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider">
             <span>แมตช์ทั้งหมด</span>
             <i data-lucide="swords" class="w-4 h-4 text-amber-400"></i>
@@ -187,8 +147,7 @@
           </div>
         </div>
 
-        <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
-          <div class="absolute -right-3 -top-3 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition"></div>
+        <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between">
           <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider">
             <span>ฮีโร่ที่มีการเล่น</span>
             <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
@@ -199,10 +158,9 @@
           </div>
         </div>
 
-        <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
-          <div class="absolute -right-3 -top-3 w-16 h-16 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition"></div>
+        <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between">
           <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider">
-            <span>วินเรตสูงสุด (Top Tier)</span>
+            <span>วินเรตสูงสุด</span>
             <i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>
           </div>
           <div class="mt-3">
@@ -211,8 +169,7 @@
           </div>
         </div>
 
-        <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
-          <div class="absolute -right-3 -top-3 w-16 h-16 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition"></div>
+        <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between">
           <div class="flex items-center justify-between text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider">
             <span>ความได้เปรียบเดินก่อน</span>
             <i data-lucide="dices" class="w-4 h-4 text-purple-400"></i>
@@ -224,7 +181,6 @@
         </div>
       </div>
 
-      <!-- Main Grid: Top Performers & Quick Recent Battles -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Hero Leaderboard Table (7 cols) -->
         <div class="lg:col-span-7 bg-[#0f172a]/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
@@ -233,7 +189,7 @@
               <h2 class="font-title text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
                 <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i> อันดับฮีโร่ยอดเยี่ยม (Hero Leaderboard)
               </h2>
-              <p class="text-xs sm:text-sm text-slate-400">เรียงตามอัตราการชนะ (ขั้นต่ำ 1 แมตช์ขึ้นไป)</p>
+              <p class="text-xs sm:text-sm text-slate-400">เรียงตามอัตราการชนะ</p>
             </div>
             <div class="relative">
               <input type="text" id="leaderboard-search" oninput="renderLeaderboard()" placeholder="ค้นหาตัวละคร..." 
@@ -242,7 +198,6 @@
             </div>
           </div>
 
-          <!-- Table Container -->
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm sm:text-base">
               <thead>
@@ -255,19 +210,27 @@
                 </tr>
               </thead>
               <tbody id="leaderboard-rows" class="divide-y divide-slate-800/60">
-                <!-- Dynamically generated rows -->
               </tbody>
             </table>
           </div>
         </div>
 
         <!-- Recent Battles Feed (5 cols) -->
+        <div class="lg:col-span-5 bg-[#0f172a]/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-title text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+              <i data-lucide="swords" class="w-5 h-5 text-rose-400"></i> ผลการต่อสู้ล่าสุด
+            </h2>
+            <button onclick="switchTab('history')" class="text-xs text-amber-400 hover:underline">ดูทั้งหมด</button>
+          </div>
+          <div id="recent-battles-list" class="space-y-3">
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- 1.5 PLAYER LEADERBOARD & STATS VIEW -->
     <section id="view-players" class="space-y-6 hidden">
-      <!-- Players Top Banner & Player Selector -->
       <div class="bg-gradient-to-r from-slate-900 via-[#101b38] to-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -289,12 +252,10 @@
             <i data-lucide="user" class="w-3.5 h-3.5 text-amber-400"></i> เลือกผู้เล่นเพื่อดูข้อมูลเชิงลึก:
           </span>
           <select id="player-profile-selector" onchange="renderPlayerProfile()" class="bg-slate-950 border border-slate-700 hover:border-amber-500/60 rounded-xl px-3 py-1.5 text-xs font-bold text-amber-300 focus:outline-none transition">
-            <!-- Populated by JS -->
           </select>
         </div>
       </div>
 
-      <!-- Main Layout: Player Leaderboard Table + Player Profile Card -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Player Leaderboard Table (6 cols) -->
         <div class="lg:col-span-6 bg-[#0f172a]/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
@@ -319,7 +280,6 @@
                 </tr>
               </thead>
               <tbody id="player-leaderboard-rows" class="divide-y divide-slate-800/60">
-                <!-- Dynamically generated rows -->
               </tbody>
             </table>
           </div>
@@ -328,7 +288,6 @@
         <!-- Selected Player Dossier Card (6 cols) -->
         <div class="lg:col-span-6 space-y-4">
           <div id="player-profile-container">
-            <!-- Rendered via JS -->
           </div>
         </div>
       </div>
@@ -336,7 +295,6 @@
 
     <!-- 2. HEAD-TO-HEAD (H2H) MATCHUP MATRIX VIEW -->
     <section id="view-matchups" class="space-y-6 hidden">
-      <!-- Hero Selection bar for H2H -->
       <div class="bg-gradient-to-r from-slate-900 via-[#101b38] to-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
         <div class="max-w-xl mx-auto text-center space-y-3">
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
@@ -345,7 +303,6 @@
           <h2 class="font-title text-xl sm:text-2xl font-black text-slate-100">เลือกหรือค้นหาฮีโร่เพื่อดูสถิติเจาะจง</h2>
           <p class="text-xs sm:text-sm text-slate-400">พิมพ์ค้นหาหรือเลือกฮีโร่ตัวโปรดของคุณ เพื่อดูว่าชนะหรือแพ้ใครมาแล้วบ้าง</p>
           
-          <!-- Searchable Hero Combobox Container -->
           <div class="pt-2 relative max-w-md mx-auto text-left" id="h2h-search-container">
             <div class="relative">
               <input type="text" 
@@ -364,27 +321,21 @@
               </button>
             </div>
 
-            <!-- Custom Floating Dropdown Menu -->
             <div id="h2h-hero-dropdown-menu" 
                  class="hidden absolute left-0 right-0 top-full mt-2 bg-slate-950/95 backdrop-blur-xl border border-amber-500/30 rounded-2xl shadow-2xl z-30 max-h-64 overflow-y-auto divide-y divide-slate-800/60 transition-all">
-              <!-- Populated via JS -->
             </div>
 
-            <!-- Hidden input holding current selected heroId -->
             <input type="hidden" id="h2h-selected-hero-id" value="">
           </div>
         </div>
       </div>
 
-      <!-- Hero Dossier Display -->
       <div id="h2h-dossier-content" class="space-y-6">
-        <!-- Rendered via JS -->
       </div>
     </section>
 
-    <!-- 2.5 TIMELINE & PERIOD SUMMARY VIEW (DAILY / MONTHLY / YEARLY) -->
+    <!-- 2.5 TIMELINE & PERIOD SUMMARY VIEW -->
     <section id="view-timeline" class="space-y-6 hidden">
-      <!-- Top Controller Card -->
       <div class="bg-gradient-to-r from-slate-900 via-[#101b38] to-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -392,10 +343,9 @@
               <i data-lucide="calendar" class="w-3.5 h-3.5"></i> SESSION & PERIOD BREAKDOWN
             </div>
             <h2 class="font-title text-xl sm:text-2xl font-bold text-white">สรุปสถิติตามช่วงเวลา</h2>
-            <p class="text-xs sm:text-sm text-slate-400">เช็กว่าในแต่ละวัน เดือน หรือปี ได้หยิบตัวละครไหนมาเล่นบ้าง และมีผลการเล่นอย่างไร</p>
+            <p class="text-xs sm:text-sm text-slate-400">เช็กว่าในแต่ละวัน เดือน หรือปี ได้หยิบตัวละครไหนมาเล่นบ้าง</p>
           </div>
 
-          <!-- Mode Selector (Day / Month / Year) -->
           <div class="flex items-center bg-slate-950 p-1.5 rounded-xl border border-slate-800 self-start md:self-auto">
             <button onclick="setTimelineGranularity('day')" id="period-btn-day" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-500 text-slate-950 shadow">
               รายวัน (Day)
@@ -409,14 +359,12 @@
           </div>
         </div>
 
-        <!-- Period Selectors / Filters -->
         <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-3">
           <div class="flex items-center gap-2">
             <span class="text-xs font-semibold text-slate-400 flex items-center gap-1">
               <i data-lucide="filter" class="w-3.5 h-3.5 text-amber-400"></i> เลือกช่วงเวลา:
             </span>
             <select id="timeline-period-select" onchange="handlePeriodSelectChange()" class="bg-slate-950 border border-slate-700 hover:border-amber-500/60 rounded-xl px-3 py-1.5 text-xs font-bold text-amber-300 focus:outline-none transition">
-              <!-- Populated by JS -->
             </select>
           </div>
 
@@ -427,9 +375,7 @@
         </div>
       </div>
 
-      <!-- Timeline Content Container -->
       <div id="timeline-results-container" class="space-y-6">
-        <!-- Rendered via JS -->
       </div>
     </section>
 
@@ -457,7 +403,6 @@
         </div>
 
         <div id="history-list-container" class="mt-4 space-y-3">
-          <!-- Rendered via JS -->
         </div>
       </div>
     </section>
@@ -469,7 +414,7 @@
           <h2 class="font-title text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
             <i data-lucide="users" class="w-5 h-5 text-amber-400"></i> ทำเนียบฮีโร่ทั้งหมด (<span id="roster-count">0</span>)
           </h2>
-          <p class="text-xs text-slate-400">คลิกที่ฮีโร่ตัวใดก็ได้เพื่อไปหน้าวิเคราะห์สถิติการเจอกันตัวต่อตัว (H2H Dossier)</p>
+          <p class="text-xs text-slate-400">คลิกที่ฮีโร่ตัวใดก็ได้เพื่อไปหน้าวิเคราะห์สถิติ H2H</p>
         </div>
         <div class="flex items-center gap-2">
           <div class="relative">
@@ -483,7 +428,6 @@
       </div>
 
       <div id="roster-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-        <!-- Rendered via JS -->
       </div>
     </section>
 
@@ -522,7 +466,6 @@
   <!-- 1. RECORD MATCH MODAL -->
   <div id="modal-record-match" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-[#0f172a] border border-slate-800 w-full max-w-xl rounded-2xl shadow-2xl p-5 sm:p-6 my-8 relative">
-      <!-- Modal Header -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
@@ -539,7 +482,7 @@
       </div>
 
       <form id="form-record-match" onsubmit="handleSaveMatch(event)" class="space-y-4">
-        <!-- WINNER SECTION (EMERALD) -->
+        <!-- WINNER SECTION -->
         <div class="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
@@ -554,7 +497,6 @@
             <div>
               <label class="block text-[11px] font-semibold text-slate-300 mb-1">เลือกฮีโร่ผู้ชนะ *</label>
               <select id="match-winner-hero" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
-                <!-- Options populated by JS -->
               </select>
             </div>
             <div>
@@ -563,7 +505,6 @@
                 <button type="button" onclick="openNewPlayerModal()" class="text-[10px] text-indigo-400 hover:underline">+ เพิ่มคนใหม่</button>
               </div>
               <select id="match-winner-player" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
-                <!-- Options populated by JS -->
               </select>
             </div>
           </div>
@@ -573,7 +514,7 @@
           </div>
         </div>
 
-        <!-- LOSER SECTION (ROSE) -->
+        <!-- LOSER SECTION -->
         <div class="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/30 space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
@@ -584,19 +525,17 @@
             <div>
               <label class="block text-[11px] font-semibold text-slate-300 mb-1">เลือกฮีโร่ผู้แพ้ *</label>
               <select id="match-loser-hero" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-rose-500 focus:outline-none">
-                <!-- Options populated by JS -->
               </select>
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-300 mb-1">เลือกผู้เล่น (Player Name) *</label>
               <select id="match-loser-player" required class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-rose-500 focus:outline-none">
-                <!-- Options populated by JS -->
               </select>
             </div>
           </div>
         </div>
 
-        <!-- DATE & TIME FIELD -->
+        <!-- DATE & TIME & MAP -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <div class="flex items-center justify-between mb-1">
@@ -607,10 +546,7 @@
                 ใช้วันเวลานี้
               </button>
             </div>
-            <div class="relative">
-              <input type="datetime-local" id="match-date-input" required class="w-full bg-slate-950 border border-slate-700 hover:border-amber-500/60 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer">
-            </div>
-            <p class="text-[10px] text-slate-400 mt-1">แตะเพื่อเลือกวัน เดือน ปี และเวลาแข่ง</p>
+            <input type="datetime-local" id="match-date-input" required class="w-full bg-slate-950 border border-slate-700 hover:border-amber-500/60 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:border-amber-500 focus:outline-none transition cursor-pointer">
           </div>
           <div>
             <label for="match-map" class="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
@@ -618,7 +554,6 @@
             </label>
             <input type="text" id="match-map" list="map-suggestions" placeholder="พิมพ์เลขโรมัน เช่น I, V หรือชื่อแมพ..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:border-amber-500 focus:outline-none transition">
             <datalist id="map-suggestions">
-              <!-- European / IELLO Roman Numeral Maps -->
               <option value="I - Sarpedon (BoL Vol. 1)"></option>
               <option value="II - Marmoreal (BoL Vol. 1)"></option>
               <option value="III - Sherwood Forest (Robin vs Bigfoot)"></option>
@@ -633,8 +568,6 @@
               <option value="XII - Fayrlund Forest (Witcher: Steel & Silver)"></option>
               <option value="XIII - Streets of Novigrad (Witcher: Realms Fall)"></option>
               <option value="XIV - Naglfar (Witcher: Realms Fall)"></option>
-              
-              <!-- Adventures & IP / Other Sets -->
               <option value="Point Pleasant (Tales to Amaze)"></option>
               <option value="McMinnville (Tales to Amaze)"></option>
               <option value="Globe Theatre (Slings and Arrows)"></option>
@@ -684,11 +617,11 @@
           <input type="text" id="custom-hero-name" required placeholder="เช่น Deadpool, Bruce Lee" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อกล่อง / ชุด (Set / Expansion Name)</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อกล่อง / ชุด (Set Name)</label>
           <input type="text" id="custom-hero-set" placeholder="เช่น Custom Hero / กล่องเสริม" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">สีประจำตัว (Hero Color Badge)</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">สีประจำตัว</label>
           <input type="color" id="custom-hero-color" value="#6366f1" class="w-full h-8 bg-slate-950 border border-slate-700 rounded-lg cursor-pointer">
         </div>
 
@@ -714,12 +647,12 @@
 
       <form id="form-new-player" onsubmit="handleSaveNewPlayer(event)" class="space-y-3.5">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อผู้เล่น (Player Name / Nickname) *</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อผู้เล่น (Player Name) *</label>
           <input type="text" id="new-player-name" required placeholder="เช่น Golf, Boss, Aom, Ton" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">ฉายาหรือข้อความแนะนำตัว (Optional)</label>
-          <input type="text" id="new-player-tagline" placeholder="เช่น เจ้าแห่งเมดูซ่า, สายป้องกัน" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+          <input type="text" id="new-player-tagline" placeholder="เช่น เจ้าแห่งเมดูซ่า, สายบุก" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
         </div>
 
         <div class="pt-3 flex justify-end gap-2">
@@ -742,7 +675,7 @@
         </button>
       </div>
 
-      <div class="space-y-3 text-xs text-slate-300">
+      <div class="space-y-3 text-xs text-slate-300 max-h-[75vh] overflow-y-auto pr-1">
         <!-- Security & Passcode Setting -->
         <div class="bg-slate-900/90 p-3.5 rounded-xl border border-indigo-500/30 space-y-2.5">
           <div class="flex items-center justify-between">
@@ -754,7 +687,7 @@
             </button>
           </div>
           <p class="text-[11px] text-slate-400 leading-relaxed">
-            สามารถเปลี่ยนรหัสผ่านเพื่อป้องกันไม่ให้ผู้อื่นเข้าใช้งานระบบสถิตินี้ได้
+            เปลี่ยนรหัสผ่านเพื่อป้องกันไม่ให้คนนอกเข้าดูหรือแก้ไขข้อมูล
           </p>
           <div class="flex items-center gap-2 pt-1">
             <input type="password" id="new-group-pin" placeholder="ตั้งรหัสผ่านใหม่ (เช่น 4-6 หลัก)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
@@ -770,24 +703,41 @@
             <span class="text-amber-400 font-bold flex items-center gap-1.5 text-xs">
               <i data-lucide="cloud" class="w-4 h-4"></i> สถานะฐานข้อมูลคลาวด์ (Cloud Sync)
             </span>
-            <span id="modal-cloud-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
-              กำลังเชื่อมต่อ
+            <span id="modal-cloud-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+              โหมดในเครื่อง (Offline)
             </span>
           </div>
           <p class="text-[11px] text-slate-400 leading-relaxed">
-            ข้อมูลการแข่งขันและฮีโร่ทั้งหมดจะถูกบันทึกขึ้นระบบคลาวด์อัตโนมัติแบบเรียลไทม์ ซิงค์พร้อมกันทั้งบนมือถือและคอมพิวเตอร์
+            เชื่อมต่อ Firebase Firestore เพื่อให้ข้อมูลการแข่งซิงค์หากันทุกเครื่องแบบเรียลไทม์
           </p>
           <div class="mt-2 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
-            <span class="text-slate-400">User / Device ID:</span>
+            <span class="text-slate-400">Device ID / User:</span>
             <span id="modal-user-id" class="font-mono text-slate-200 bg-slate-950 px-2 py-0.5 rounded border border-slate-800 select-all">
-              กำลังโหลด...
+              Local Storage Only
             </span>
+          </div>
+
+          <!-- Firebase Config Input Box -->
+          <div class="mt-3 pt-3 border-t border-slate-800/80 space-y-2">
+            <label for="custom-firebase-config" class="block text-xs font-semibold text-slate-300 flex items-center justify-between">
+              <span>วางชุด Firebase Config ที่นี่:</span>
+              <button type="button" onclick="clearFirebaseConfigInput()" class="text-[10px] text-slate-500 hover:text-rose-400">ล้างค่า</button>
+            </label>
+            <textarea id="custom-firebase-config" rows="4" placeholder='{
+  apiKey: "AIzaSy...",
+  authDomain: "...",
+  projectId: "...",
+  ...
+}' class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 font-mono text-[11px] text-amber-300 focus:outline-none focus:border-amber-500 leading-tight"></textarea>
+            <button type="button" onclick="saveAndApplyFirebaseConfig()" class="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/10 transition">
+              <i data-lucide="save" class="w-3.5 h-3.5"></i> บันทึกและเชื่อมต่อ Cloud
+            </button>
           </div>
         </div>
 
         <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
           <p class="font-semibold text-white mb-1">ส่งออก / นำเข้า (Backup / Transfer)</p>
-          <p class="text-[11px] text-slate-400 mb-3">สามารถเซฟไฟล์ข้อมูลเป็น JSON เพื่อสำรองเก็บไว้ในเครื่องได้</p>
+          <p class="text-[11px] text-slate-400 mb-3">ย้ายข้อมูลไปเครื่องอื่นได้ง่ายๆ โดยไม่ต้องต่อเน็ต</p>
           <div class="flex items-center gap-2">
             <button onclick="exportData()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg font-semibold text-slate-200 flex items-center justify-center gap-1.5 transition">
               <i data-lucide="download" class="w-3.5 h-3.5"></i> Export JSON
@@ -800,7 +750,7 @@
         </div>
 
         <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-2">
-          <p class="font-semibold text-white">ข้อมูลตัวอย่าง & ล้างข้อมูลคลาวด์</p>
+          <p class="font-semibold text-white">ข้อมูลตัวอย่าง & ล้างข้อมูล</p>
           <div class="flex items-center gap-2">
             <button onclick="loadSampleData()" class="flex-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 py-2 rounded-lg font-semibold transition">
               โหลดข้อมูลตัวอย่าง
@@ -825,11 +775,6 @@
   <!-- PASSCODE / PIN PROTECTION GATE MODAL -->
   <div id="security-gate" class="fixed inset-0 z-[100] bg-[#070b14]/95 backdrop-blur-xl flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-[#0f172a] border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-amber-500/10 text-center space-y-6 relative overflow-hidden">
-      <!-- Glow ambient background -->
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/15 rounded-full blur-2xl pointer-events-none"></div>
-      <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-rose-500/15 rounded-full blur-2xl pointer-events-none"></div>
-
-      <!-- Icon & Title -->
       <div class="space-y-2">
         <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center shadow-lg shadow-amber-500/20 border border-amber-400/30">
           <i data-lucide="lock" class="w-7 h-7 text-white stroke-[2.2]"></i>
@@ -840,7 +785,6 @@
         <p class="text-xs text-slate-400">เฉพาะสมาชิกภายในกลุ่ม กรุณากรอกรหัสผ่านเพื่อเข้าใช้งาน</p>
       </div>
 
-      <!-- Pin Input Form -->
       <form onsubmit="handlePasscodeSubmit(event)" class="space-y-4">
         <div>
           <input type="password" id="passcode-input" autofocus autocomplete="current-password" placeholder="กรอกรหัสผ่าน (PIN)" 
@@ -864,9 +808,7 @@
 
   <!-- APPLICATION LOGIC JAVASCRIPT -->
   <script>
-    /* ========================================================
-       0. SECURITY & PASSCODE PROTECTION GATE
-       ======================================================== */
+    /* 0. SECURITY & PASSCODE */
     const DEFAULT_PASSCODE = '1234';
     const PASSCODE_STORAGE_KEY = 'unmatched_group_pin_key';
     const AUTH_SESSION_KEY = 'unmatched_authenticated_token';
@@ -907,7 +849,6 @@
         if (err) err.classList.remove('hidden');
         input.value = '';
         input.focus();
-        // Shake animation effect
         input.classList.add('border-rose-500');
         setTimeout(() => input.classList.remove('border-rose-500'), 1000);
       }
@@ -938,9 +879,7 @@
       showToast('เปลี่ยนรหัสผ่านกลุ่มสำเร็จแล้ว!');
     }
 
-    /* ========================================================
-       1. INITIAL HERO PRESETS & DATA SCHEMA
-       ======================================================== */
+    /* 1. INITIAL DATA PRESETS */
     const DEFAULT_PLAYERS = [
       { id: 'golf', name: 'Golf', tagline: 'จอมวางแผน' },
       { id: 'boss', name: 'Boss', tagline: 'สายบุกทะลวง' },
@@ -999,7 +938,7 @@
         winnerFirstTurn: true,
         loserHero: 'king-arthur',
         loserPlayer: 'Boss',
-        map: 'Sarpedon',
+        map: 'I - Sarpedon (BoL Vol. 1)',
         notes: 'Gaze of Stone ชนะตอน Arthur การ์ดหมดมือ'
       },
       {
@@ -1011,56 +950,20 @@
         winnerFirstTurn: false,
         loserHero: 'medusa',
         loserPlayer: 'Golf',
-        map: 'Sarpedon',
+        map: 'I - Sarpedon (BoL Vol. 1)',
         notes: 'Achilles บ้าคลั่งหลัง Patroclus ตาย'
       },
       {
         id: 'm3',
-        date: new Date(Date.now() - 86400000 * 3).toISOString(),
-        winnerHero: 'sherlock-holmes',
+        date: new Date(Date.now() - 86400000 * 2).toISOString(),
+        winnerHero: 'geralt-of-rivia',
         winnerPlayer: 'Aom',
-        winnerHp: 11,
+        winnerHp: 8,
         winnerFirstTurn: true,
         loserHero: 'dracula',
         loserPlayer: 'Boss',
-        map: 'Baskerville Manor',
-        notes: 'Confirm Suspicion ทายการ์ดแม่นยำ'
-      },
-      {
-        id: 'm4',
-        date: new Date(Date.now() - 86400000 * 2).toISOString(),
-        winnerHero: 'bigfoot',
-        winnerPlayer: 'Golf',
-        winnerHp: 9,
-        winnerFirstTurn: true,
-        loserHero: 'robin-hood',
-        loserPlayer: 'Aom',
-        map: 'Sherwood Forest',
-        notes: 'บุกชนหนักด้วย Jackalope'
-      },
-      {
-        id: 'm5',
-        date: new Date(Date.now() - 86400000 * 1).toISOString(),
-        winnerHero: 'sun-wukong',
-        winnerPlayer: 'Ton',
-        winnerHp: 5,
-        winnerFirstTurn: false,
-        loserHero: 'achilles',
-        loserPlayer: 'Golf',
-        map: 'Yukon',
-        notes: 'แยกร่างโคลนล้อม Achilles'
-      },
-      {
-        id: 'm6',
-        date: new Date(Date.now() - 3600000 * 5).toISOString(),
-        winnerHero: 'medusa',
-        winnerPlayer: 'Golf',
-        winnerHp: 12,
-        winnerFirstTurn: true,
-        loserHero: 'sherlock-holmes',
-        loserPlayer: 'Aom',
-        map: 'Soho',
-        notes: 'ฮาร์ปี้ล้อมปิดทางเดิน'
+        map: 'XI - Kaer Morhen (Witcher: Steel & Silver)',
+        notes: 'ใช้ Potion และ Silver Sword ปิดฉาก'
       }
     ];
 
@@ -1069,202 +972,225 @@
     let matches = [];
     let players = [];
     let currentTab = 'dashboard';
-    let timelineGranularity = 'day'; // 'day' | 'month' | 'year'
+    let timelineGranularity = 'day';
     let selectedTimelinePeriod = null;
-    let selectedPlayerId = null;
 
-    // Cloud Database & Auth State
+    // Cloud Database State
     let db = null;
     let auth = null;
     let currentUser = null;
     let isCloudReady = false;
-    let unsubscribeMatches = null;
-    let unsubscribeHeroes = null;
 
-    /* ========================================================
-       2. INITIALIZATION & CLOUD DATABASE SYNC
-       ======================================================== */
-    async function initCloudDatabase() {
-      if (!window._fb) {
-        console.warn('Firebase library is not loaded. Falling back to local storage.');
-        initAppFallback();
-        return;
+    const CUSTOM_FIREBASE_STORAGE_KEY = 'unmatched_custom_firebase_config';
+
+    function getSavedFirebaseConfig() {
+      const saved = localStorage.getItem(CUSTOM_FIREBASE_STORAGE_KEY);
+      if (saved) {
+        try { return parseConfigString(saved); } catch(e) {}
       }
+      if (typeof window.MY_FIREBASE_CONFIG !== 'undefined') {
+        return window.MY_FIREBASE_CONFIG;
+      }
+      return null;
+    }
 
+    function parseConfigString(rawStr) {
+      let str = rawStr.trim();
+      if (str.includes('=')) str = str.substring(str.indexOf('=') + 1).trim();
+      if (str.endsWith(';')) str = str.slice(0, -1).trim();
       try {
-        const { initializeApp, getAuth, signInWithCustomToken, signInAnonymously, getFirestore, collection, doc, setDoc, onSnapshot } = window._fb;
-
-        // Initialize App Config
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-        let firebaseConfig = {};
-        if (typeof __firebase_config !== 'undefined') {
-          try {
-            firebaseConfig = JSON.parse(__firebase_config);
-          } catch(e) {
-            console.warn('Could not parse __firebase_config', e);
-          }
-        }
-
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-
-        // Authenticate with custom token or anonymously
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          try {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } catch(e) {
-            console.warn('Custom token sign-in failed, trying anonymous sign-in', e);
-            await signInAnonymously(auth);
-          }
-        } else {
-          await signInAnonymously(auth);
-        }
-
-        currentUser = auth.currentUser;
-        const userId = currentUser?.uid || 'user-' + Math.floor(Math.random() * 100000);
-
-        // Update UI status
-        updateCloudStatus(true, userId);
-
-        // Setup Realtime Sync for Heroes (Public Collection)
-        const heroesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'heroes');
-        unsubscribeHeroes = onSnapshot(heroesCollectionRef, (snapshot) => {
-          if (!snapshot.empty) {
-            const cloudHeroes = [];
-            snapshot.forEach(docSnap => {
-              cloudHeroes.push(docSnap.data());
-            });
-            heroes = cloudHeroes.length > 0 ? cloudHeroes : [...DEFAULT_HEROES];
-          } else {
-            heroes = [...DEFAULT_HEROES];
-            seedInitialHeroesToCloud(heroesCollectionRef);
-          }
-          populateHeroDropdowns();
-          refreshAllViews();
-        }, (error) => {
-          console.error("Heroes realtime listener error:", error);
-        });
-
-        // Setup Realtime Sync for Players (Public Collection)
-        const playersCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'players');
-        onSnapshot(playersCollectionRef, (snapshot) => {
-          if (!snapshot.empty) {
-            const cloudPlayers = [];
-            snapshot.forEach(docSnap => {
-              cloudPlayers.push(docSnap.data());
-            });
-            players = cloudPlayers.length > 0 ? cloudPlayers : [...DEFAULT_PLAYERS];
-          } else {
-            players = [...DEFAULT_PLAYERS];
-            seedInitialPlayersToCloud(playersCollectionRef);
-          }
-          populatePlayerDropdowns();
-          refreshAllViews();
-        }, (error) => {
-          console.error("Players realtime listener error:", error);
-        });
-
-        // Setup Realtime Sync for Matches (Public Collection)
-        const matchesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'matches');
-        unsubscribeMatches = onSnapshot(matchesCollectionRef, (snapshot) => {
-          const cloudMatches = [];
-          snapshot.forEach(docSnap => {
-            cloudMatches.push(docSnap.data());
-          });
-
-          // Sort descending by date
-          cloudMatches.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-          if (cloudMatches.length > 0 || snapshot.metadata.hasPendingWrites) {
-            matches = cloudMatches;
-          } else {
-            // Seed sample matches to cloud on first launch
-            matches = [...SAMPLE_MATCHES];
-            seedInitialMatchesToCloud(matchesCollectionRef);
-          }
-          refreshAllViews();
-        }, (error) => {
-          console.error("Matches realtime listener error:", error);
-        });
-
-        isCloudReady = true;
-
+        return JSON.parse(str);
       } catch (err) {
-        console.error('Failed to initialize Cloud Database:', err);
-        updateCloudStatus(false);
-        initAppFallback();
+        return Function('"use strict";return (' + str + ')')();
       }
     }
 
-    function updateCloudStatus(isOnline, userId = '') {
-      const pill = document.getElementById('cloud-status-pill');
+    async function saveAndApplyFirebaseConfig() {
+      const textarea = document.getElementById('custom-firebase-config');
+      const val = textarea.value.trim();
+      if (!val) {
+        showToast('กรุณาวางชุดโค้ด Firebase Config ก่อนกดบันทึก');
+        return;
+      }
+      try {
+        const parsed = parseConfigString(val);
+        if (!parsed || !parsed.projectId) {
+          showToast('รูปแบบไม่ถูกต้อง: ต้องมี projectId');
+          return;
+        }
+        localStorage.setItem(CUSTOM_FIREBASE_STORAGE_KEY, JSON.stringify(parsed, null, 2));
+        showToast('บันทึกสำเร็จ! กำลังเชื่อมต่อ Cloud...');
+        setTimeout(() => initCloudDatabase(), 300);
+      } catch (err) {
+        showToast('รูปแบบโค้ดไม่ถูกต้อง กรุณาคัดลอกเฉพาะก้อน { ... }');
+      }
+    }
+
+    function updateCloudStatus(isConnected, userId = null) {
       const dot = document.getElementById('cloud-status-dot');
       const text = document.getElementById('cloud-status-text');
       const modalBadge = document.getElementById('modal-cloud-badge');
       const modalUserId = document.getElementById('modal-user-id');
 
-      if (isOnline) {
-        if (pill) pill.classList.remove('hidden');
-        if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
-        if (text) text.innerText = 'คลาวด์เชื่อมต่อแล้ว';
+      if (isConnected) {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400';
+        if (text) {
+          text.innerText = 'คลาวด์เชื่อมต่อแล้ว';
+          text.className = 'text-emerald-400 font-semibold';
+        }
         if (modalBadge) {
           modalBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30';
-          modalBadge.innerText = 'ออนไลน์ (เรียลไทม์)';
+          modalBadge.innerText = 'เชื่อมต่อแล้ว (Online)';
         }
-        if (modalUserId) modalUserId.innerText = userId;
+        if (modalUserId && userId) modalUserId.innerText = userId;
       } else {
         if (dot) dot.className = 'w-2 h-2 rounded-full bg-slate-500';
-        if (text) text.innerText = 'ออฟไลน์ (ในเครื่อง)';
+        if (text) {
+          text.innerText = 'ออฟไลน์ (ในเครื่อง)';
+          text.className = 'text-slate-400 font-medium';
+        }
         if (modalBadge) {
-          modalBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-slate-500/10 text-slate-400 border border-slate-700';
-          modalBadge.innerText = 'ออฟไลน์';
+          modalBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
+          modalBadge.innerText = 'โหมดในเครื่อง (Offline)';
         }
-        if (modalUserId) modalUserId.innerText = 'Local Device Only';
+        if (modalUserId) modalUserId.innerText = 'Local Storage Only';
       }
     }
 
-    async function seedInitialHeroesToCloud(collectionRef) {
-      if (!db || !auth.currentUser) return;
+    function clearFirebaseConfigInput() {
+      const textarea = document.getElementById('custom-firebase-config');
+      if (textarea) textarea.value = '';
+      localStorage.removeItem(CUSTOM_FIREBASE_STORAGE_KEY);
+      showToast('ล้างค่า Firebase Config แล้ว (กลับสู่โหมดออฟไลน์)');
+      updateCloudStatus(false);
+    }
+
+    async function initCloudDatabase() {
+      if (!window._fb) {
+        initAppFallback();
+        return;
+      }
+
+      const firebaseConfig = getSavedFirebaseConfig();
+      if (!firebaseConfig || !firebaseConfig.projectId) {
+        updateCloudStatus(false);
+        initAppFallback();
+        return;
+      }
+
+      try {
+        const { initializeApp, getAuth, signInAnonymously, getFirestore, collection, doc, setDoc, onSnapshot } = window._fb;
+
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        try {
+          await signInAnonymously(auth);
+        } catch (authErr) {
+          console.warn('Anonymous auth failed:', authErr);
+        }
+
+        currentUser = auth.currentUser;
+        const userId = currentUser?.uid || 'user-' + Math.floor(Math.random() * 100000);
+        updateCloudStatus(true, userId);
+
+        const configTextarea = document.getElementById('custom-firebase-config');
+        if (configTextarea && !configTextarea.value) {
+          configTextarea.value = JSON.stringify(firebaseConfig, null, 2);
+        }
+
+        const heroesCol = collection(db, 'unmatched_heroes');
+        const playersCol = collection(db, 'unmatched_players');
+        const matchesCol = collection(db, 'unmatched_matches');
+
+        onSnapshot(heroesCol, (snapshot) => {
+          if (!snapshot.empty) {
+            const cloudHeroes = [];
+            snapshot.forEach(docSnap => cloudHeroes.push(docSnap.data()));
+            heroes = cloudHeroes;
+          } else {
+            heroes = [...DEFAULT_HEROES];
+            seedInitialHeroesToCloud();
+          }
+          populateHeroDropdowns();
+          refreshAllViews();
+        }, (error) => {
+          console.warn('Heroes listener restricted by rules, using local fallback:', error.message);
+          initAppFallback();
+        });
+
+        onSnapshot(playersCol, (snapshot) => {
+          if (!snapshot.empty) {
+            const cloudPlayers = [];
+            snapshot.forEach(docSnap => cloudPlayers.push(docSnap.data()));
+            players = cloudPlayers;
+          } else {
+            players = [...DEFAULT_PLAYERS];
+            seedInitialPlayersToCloud();
+          }
+          populatePlayerDropdowns();
+          refreshAllViews();
+        }, (error) => {
+          console.warn('Players listener restricted:', error.message);
+        });
+
+        onSnapshot(matchesCol, (snapshot) => {
+          const cloudMatches = [];
+          snapshot.forEach(docSnap => cloudMatches.push(docSnap.data()));
+          cloudMatches.sort((a, b) => new Date(b.date) - new Date(a.date));
+          if (cloudMatches.length > 0 || snapshot.metadata.hasPendingWrites) {
+            matches = cloudMatches;
+          } else {
+            matches = [...SAMPLE_MATCHES];
+            seedInitialMatchesToCloud();
+          }
+          refreshAllViews();
+        }, (error) => {
+          console.warn('Matches listener restricted:', error.message);
+          initAppFallback();
+        });
+
+        isCloudReady = true;
+
+      } catch (err) {
+        console.error('Cloud Database init error:', err);
+        updateCloudStatus(false);
+        initAppFallback();
+      }
+    }
+
+    async function seedInitialHeroesToCloud() {
+      if (!db) return;
       try {
         const { doc, setDoc } = window._fb;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
         for (const h of DEFAULT_HEROES) {
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'heroes', h.id), h);
+          await setDoc(doc(db, 'unmatched_heroes', h.id), h);
         }
-      } catch(e) {
-        console.warn('Seeding heroes skipped/failed', e);
-      }
+      } catch(e) {}
     }
 
-    async function seedInitialPlayersToCloud(collectionRef) {
-      if (!db || !auth.currentUser) return;
+    async function seedInitialPlayersToCloud() {
+      if (!db) return;
       try {
         const { doc, setDoc } = window._fb;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
         for (const p of DEFAULT_PLAYERS) {
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', p.id), p);
+          await setDoc(doc(db, 'unmatched_players', p.id), p);
         }
-      } catch(e) {
-        console.warn('Seeding players skipped/failed', e);
-      }
+      } catch(e) {}
     }
 
-    async function seedInitialMatchesToCloud(collectionRef) {
-      if (!db || !auth.currentUser) return;
+    async function seedInitialMatchesToCloud() {
+      if (!db) return;
       try {
         const { doc, setDoc } = window._fb;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
         for (const m of SAMPLE_MATCHES) {
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'matches', m.id), m);
+          await setDoc(doc(db, 'unmatched_matches', m.id), m);
         }
-      } catch(e) {
-        console.warn('Seeding matches skipped/failed', e);
-      }
+      } catch(e) {}
     }
 
     function initAppFallback() {
-      // Load from LocalStorage if available
       const localPlayers = localStorage.getItem('unmatched_local_players');
       const localHeroes = localStorage.getItem('unmatched_local_heroes');
       const localMatches = localStorage.getItem('unmatched_local_matches');
@@ -1274,10 +1200,9 @@
       if (localHeroes) {
         try {
           const parsedHeroes = JSON.parse(localHeroes);
-          // Auto-merge newly added default heroes into existing local storage
           const heroMap = new Map();
           DEFAULT_HEROES.forEach(h => heroMap.set(h.id, h));
-          parsedHeroes.forEach(h => heroMap.set(h.id, h)); // Preserve user custom heroes / edits
+          parsedHeroes.forEach(h => heroMap.set(h.id, h));
           heroes = Array.from(heroMap.values());
         } catch(e) {
           heroes = [...DEFAULT_HEROES];
@@ -1291,7 +1216,7 @@
       populateHeroDropdowns();
       populatePlayerDropdowns();
       refreshAllViews();
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function saveLocalData() {
@@ -1299,9 +1224,7 @@
         localStorage.setItem('unmatched_local_players', JSON.stringify(players));
         localStorage.setItem('unmatched_local_heroes', JSON.stringify(heroes));
         localStorage.setItem('unmatched_local_matches', JSON.stringify(matches));
-      } catch(e) {
-        console.warn('Local storage save failed', e);
-      }
+      } catch(e) {}
     }
 
     function getHero(id) {
@@ -1314,9 +1237,7 @@
       return found || { id: nameOrId, name: nameOrId, tagline: '' };
     }
 
-    /* ========================================================
-       3. NAVIGATION & VIEW SWITCHING
-       ======================================================== */
+    /* 3. NAVIGATION */
     function switchTab(tabId) {
       currentTab = tabId;
       const views = ['dashboard', 'players', 'matchups', 'timeline', 'history', 'roster'];
@@ -1329,27 +1250,22 @@
         if (v === tabId) {
           if (el) el.classList.remove('hidden');
           if (navDesktop) {
-            navDesktop.className = 'tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-slate-950 shadow-md';
+            navDesktop.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-slate-950 shadow-md';
           }
           if (navMob) {
             navMob.className = 'flex flex-col items-center gap-1 text-amber-400';
-            const span = navMob.querySelector('span');
-            if (span) span.className = 'text-[9px] font-bold';
           }
         } else {
           if (el) el.classList.add('hidden');
           if (navDesktop) {
-            navDesktop.className = 'tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all';
+            navDesktop.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800 flex items-center gap-2 transition-all';
           }
           if (navMob) {
             navMob.className = 'flex flex-col items-center gap-1 text-slate-400';
-            const span = navMob.querySelector('span');
-            if (span) span.className = 'text-[9px] font-medium';
           }
         }
       });
 
-      // Triggers
       if (tabId === 'players') {
         renderPlayerLeaderboard();
         renderPlayerProfile();
@@ -1366,7 +1282,7 @@
       }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function refreshAllViews() {
@@ -1381,16 +1297,13 @@
       renderRosterGrid();
     }
 
-    /* ========================================================
-       4.5 PLAYER LEADERBOARD & DOSSIER LOGIC
-       ======================================================== */
+    /* 4. PLAYER LEADERBOARD & DOSSIER */
     function populatePlayerDropdowns() {
       const winnerPlayerSelect = document.getElementById('match-winner-player');
       const loserPlayerSelect = document.getElementById('match-loser-player');
       const profilePlayerSelect = document.getElementById('player-profile-selector');
 
       const sortedPlayers = [...players].sort((a, b) => a.name.localeCompare(b.name));
-
       const optionsHtml = sortedPlayers.map(p => `<option value="${p.name}">${p.name} ${p.tagline ? `(${p.tagline})` : ''}</option>`).join('');
 
       if (winnerPlayerSelect) winnerPlayerSelect.innerHTML = optionsHtml;
@@ -1405,7 +1318,6 @@
 
     function computePlayerStats() {
       const stats = {};
-
       players.forEach(p => {
         stats[p.name.toLowerCase()] = {
           player: p,
@@ -1413,8 +1325,8 @@
           wins: 0,
           losses: 0,
           winrate: 0,
-          heroUsage: {}, // heroId: { played: 0, wins: 0, losses: 0 }
-          opponents: {}  // oppPlayerName: { played: 0, wins: 0, losses: 0 }
+          heroUsage: {},
+          opponents: {}
         };
       });
 
@@ -1422,20 +1334,17 @@
         const winName = (m.winnerPlayer || '').trim();
         const loseName = (m.loserPlayer || '').trim();
 
-        // Calculate only if player is in registered players list
         if (winName && stats[winName.toLowerCase()]) {
           const keyW = winName.toLowerCase();
           stats[keyW].matches++;
           stats[keyW].wins++;
 
-          // Hero usage
           if (!stats[keyW].heroUsage[m.winnerHero]) {
             stats[keyW].heroUsage[m.winnerHero] = { played: 0, wins: 0, losses: 0 };
           }
           stats[keyW].heroUsage[m.winnerHero].played++;
           stats[keyW].heroUsage[m.winnerHero].wins++;
 
-          // Opponent
           if (loseName) {
             if (!stats[keyW].opponents[loseName]) {
               stats[keyW].opponents[loseName] = { played: 0, wins: 0, losses: 0 };
@@ -1450,14 +1359,12 @@
           stats[keyL].matches++;
           stats[keyL].losses++;
 
-          // Hero usage
           if (!stats[keyL].heroUsage[m.loserHero]) {
             stats[keyL].heroUsage[m.loserHero] = { played: 0, wins: 0, losses: 0 };
           }
           stats[keyL].heroUsage[m.loserHero].played++;
           stats[keyL].heroUsage[m.loserHero].losses++;
 
-          // Opponent
           if (winName) {
             if (!stats[keyL].opponents[winName]) {
               stats[keyL].opponents[winName] = { played: 0, wins: 0, losses: 0 };
@@ -1482,7 +1389,6 @@
       const stats = computePlayerStats();
       const list = Object.values(stats);
 
-      // Sort by Win Rate then Wins then Matches
       list.sort((a, b) => {
         if (b.matches === 0 && a.matches === 0) return a.player.name.localeCompare(b.player.name);
         return (b.winrate - a.winrate) || (b.wins - a.wins) || (b.matches - a.matches);
@@ -1499,8 +1405,8 @@
         const medal = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `${idx + 1}`));
 
         return `
-          <tr class="hover:bg-slate-800/40 transition group">
-            <td class="py-3 px-3 cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">
+          <tr class="hover:bg-slate-800/40 transition group cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">
+            <td class="py-3 px-3">
               <div class="flex items-center gap-2.5">
                 <span class="w-6 text-center text-sm font-bold text-slate-400">${medal}</span>
                 <div class="w-9 h-9 rounded-full bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center font-bold text-indigo-300 shrink-0 text-sm">
@@ -1512,10 +1418,10 @@
                 </div>
               </div>
             </td>
-            <td class="py-3 px-2 text-center font-semibold text-slate-300 text-sm sm:text-base cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">${item.matches}</td>
-            <td class="py-3 px-2 text-center font-bold text-emerald-400 text-sm sm:text-base cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">${item.wins}</td>
-            <td class="py-3 px-2 text-center font-bold text-rose-400 text-sm sm:text-base cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">${item.losses}</td>
-            <td class="py-3 px-3 text-right cursor-pointer" onclick="jumpToPlayer('${p.id || p.name}')">
+            <td class="py-3 px-2 text-center font-semibold text-slate-300 text-sm sm:text-base">${item.matches}</td>
+            <td class="py-3 px-2 text-center font-bold text-emerald-400 text-sm sm:text-base">${item.wins}</td>
+            <td class="py-3 px-2 text-center font-bold text-rose-400 text-sm sm:text-base">${item.losses}</td>
+            <td class="py-3 px-3 text-right">
               <div class="inline-flex flex-col items-end">
                 <span class="font-black text-sm sm:text-base ${wrColor}">${item.matches > 0 ? item.winrate + '%' : '-'}</span>
                 <div class="w-20 bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
@@ -1532,7 +1438,6 @@
       switchTab('players');
       const selector = document.getElementById('player-profile-selector');
       if (selector) {
-        // match by value or option text
         for (let i = 0; i < selector.options.length; i++) {
           if (selector.options[i].value.toLowerCase() === playerIdOrName.toLowerCase() ||
               selector.options[i].text.toLowerCase().includes(playerIdOrName.toLowerCase())) {
@@ -1559,7 +1464,6 @@
       const stats = computePlayerStats();
       const pStat = stats[playerObj.name.toLowerCase()] || { matches: 0, wins: 0, losses: 0, winrate: 0, heroUsage: {}, opponents: {} };
 
-      // Calculate Most Played Hero & Signature (Best Winrate) Hero
       const heroUsageList = Object.entries(pStat.heroUsage).map(([hId, val]) => {
         const wr = val.played > 0 ? Math.round((val.wins / val.played) * 100) : 0;
         return { hero: getHero(hId), ...val, winrate: wr };
@@ -1569,7 +1473,6 @@
       const mostPlayed = heroUsageList.length > 0 ? heroUsageList[0] : null;
       const signatureHero = heroUsageList.length > 0 ? [...heroUsageList].sort((a, b) => b.winrate - a.winrate || b.wins - a.wins)[0] : null;
 
-      // Opponent Head-to-Head
       const oppList = Object.entries(pStat.opponents).map(([oppName, val]) => {
         const wr = val.played > 0 ? Math.round((val.wins / val.played) * 100) : 0;
         return { oppName, ...val, winrate: wr };
@@ -1577,7 +1480,6 @@
       oppList.sort((a, b) => b.played - a.played);
 
       container.innerHTML = `
-        <!-- Profile Header -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
           <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-3.5">
@@ -1591,17 +1493,13 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-3">
-              <!-- Stats Badge -->
-              <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-center min-w-[90px]">
-                <span class="text-[10px] uppercase font-bold text-slate-400">WIN RATE</span>
-                <p class="text-xl font-black ${pStat.winrate >= 50 ? 'text-emerald-400' : 'text-rose-400'}">${pStat.matches > 0 ? pStat.winrate + '%' : '-'}</p>
-                <p class="text-[10px] text-slate-500">${pStat.wins}W - ${pStat.losses}L</p>
-              </div>
+            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-center min-w-[90px]">
+              <span class="text-[10px] uppercase font-bold text-slate-400">WIN RATE</span>
+              <p class="text-xl font-black ${pStat.winrate >= 50 ? 'text-emerald-400' : 'text-rose-400'}">${pStat.matches > 0 ? pStat.winrate + '%' : '-'}</p>
+              <p class="text-[10px] text-slate-500">${pStat.wins}W - ${pStat.losses}L</p>
             </div>
           </div>
 
-          <!-- Quick Highlight: Most Played & Best Hero -->
           <div class="grid grid-cols-2 gap-2.5 mt-4 pt-4 border-t border-slate-800/80">
             <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
               <span class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
@@ -1621,7 +1519,6 @@
           </div>
         </div>
 
-        <!-- Hero Pool Breakdown by this Player -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h4 class="font-title text-sm font-bold text-white mb-3 flex items-center gap-2">
             <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i> สถิติการหยิบฮีโร่ของ ${playerObj.name}
@@ -1646,7 +1543,6 @@
           `}
         </div>
 
-        <!-- H2H Against other Players -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <h4 class="font-title text-sm font-bold text-white mb-3 flex items-center gap-2">
             <i data-lucide="swords" class="w-4 h-4 text-amber-400"></i> ผลการเจอกับเพื่อนในกลุ่ม
@@ -1668,7 +1564,7 @@
           `}
         </div>
       `;
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function openNewPlayerModal() {
@@ -1691,14 +1587,12 @@
       closeModal('modal-new-player');
       showToast(`เพิ่มผู้เล่น "${name}" เรียบร้อยแล้ว!`);
 
-      // Sync to cloud if ready
-      if (isCloudReady && db && auth.currentUser) {
+      if (isCloudReady && db) {
         try {
           const { doc, setDoc } = window._fb;
-          const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'players', slug), newPlayer);
+          await setDoc(doc(db, 'unmatched_players', slug), newPlayer);
         } catch(err) {
-          console.warn('Cloud sync error for new player', err);
+          console.warn('Cloud sync error for new player:', err);
         }
       }
 
@@ -1706,6 +1600,7 @@
       renderPlayerProfile();
     }
 
+    /* 5. HERO STATS & DASHBOARD */
     function computeHeroStats() {
       const stats = {};
       heroes.forEach(h => {
@@ -1720,28 +1615,24 @@
       });
 
       matches.forEach(m => {
-        // Winner
         if (!stats[m.winnerHero]) {
           stats[m.winnerHero] = { hero: getHero(m.winnerHero), matches: 0, wins: 0, losses: 0, winrate: 0, headToHead: {} };
         }
         stats[m.winnerHero].matches++;
         stats[m.winnerHero].wins++;
 
-        // Head-to-Head Winner vs Loser
         if (!stats[m.winnerHero].headToHead[m.loserHero]) {
           stats[m.winnerHero].headToHead[m.loserHero] = { played: 0, wins: 0, losses: 0 };
         }
         stats[m.winnerHero].headToHead[m.loserHero].played++;
         stats[m.winnerHero].headToHead[m.loserHero].wins++;
 
-        // Loser
         if (!stats[m.loserHero]) {
           stats[m.loserHero] = { hero: getHero(m.loserHero), matches: 0, wins: 0, losses: 0, winrate: 0, headToHead: {} };
         }
         stats[m.loserHero].matches++;
         stats[m.loserHero].losses++;
 
-        // Head-to-Head Loser vs Winner
         if (!stats[m.loserHero].headToHead[m.winnerHero]) {
           stats[m.loserHero].headToHead[m.winnerHero] = { played: 0, wins: 0, losses: 0 };
         }
@@ -1749,7 +1640,6 @@
         stats[m.loserHero].headToHead[m.winnerHero].losses++;
       });
 
-      // Calculate win rates
       Object.keys(stats).forEach(id => {
         const item = stats[id];
         item.winrate = item.matches > 0 ? Math.round((item.wins / item.matches) * 100) : 0;
@@ -1767,7 +1657,6 @@
       const activeHeroesCount = Object.values(stats).filter(s => s.matches > 0).length;
       document.getElementById('stat-active-heroes').innerText = activeHeroesCount;
 
-      // Top Hero by Winrate (Min 1 match)
       const playedHeroes = Object.values(stats).filter(s => s.matches >= 1);
       playedHeroes.sort((a, b) => b.winrate - a.winrate || b.wins - a.wins);
 
@@ -1780,7 +1669,6 @@
         document.getElementById('stat-top-hero-sub').innerText = 'ยังไม่มีข้อมูล';
       }
 
-      // First Turn Advantage
       const turn1Wins = matches.filter(m => m.winnerFirstTurn).length;
       const turn1Winrate = totalMatches > 0 ? Math.round((turn1Wins / totalMatches) * 100) : 50;
       document.getElementById('stat-p1-winrate').innerText = `${turn1Winrate}%`;
@@ -1796,7 +1684,6 @@
         return s.hero.name.toLowerCase().includes(filter) || s.hero.set.toLowerCase().includes(filter);
       });
 
-      // Sort: played first, then win rate, then wins
       list.sort((a, b) => {
         if (b.matches === 0 && a.matches === 0) return a.hero.name.localeCompare(b.hero.name);
         return (b.winrate - a.winrate) || (b.matches - a.matches);
@@ -1872,7 +1759,6 @@
             </div>
 
             <div class="flex items-center justify-between gap-2">
-              <!-- Winner -->
               <div class="flex items-center gap-2 truncate">
                 <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${winner.color}"></span>
                 <div class="truncate">
@@ -1883,10 +1769,8 @@
                 </div>
               </div>
 
-              <!-- VS Badge -->
               <span class="text-[10px] font-black text-slate-500 px-2 py-0.5 rounded bg-slate-800">VS</span>
 
-              <!-- Loser -->
               <div class="flex items-center gap-2 justify-end text-right truncate">
                 <div class="truncate">
                   <p class="text-xs font-bold text-rose-400 truncate">${loser.name}</p>
@@ -1904,24 +1788,20 @@
           </div>
         `;
       }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
-    /* ========================================================
-       5. HEAD-TO-HEAD (H2H) DOSSIER LOGIC
-       ======================================================== */
+    /* 6. H2H COMBOBOX & DOSSIER */
     function populateHeroDropdowns() {
       const matchWinnerSelect = document.getElementById('match-winner-hero');
       const matchLoserSelect = document.getElementById('match-loser-hero');
 
       const sortedHeroes = [...heroes].sort((a, b) => a.name.localeCompare(b.name));
-
       const optionsHtml = sortedHeroes.map(h => `<option value="${h.id}">${h.name} (${h.set})</option>`).join('');
 
       if (matchWinnerSelect) matchWinnerSelect.innerHTML = optionsHtml;
       if (matchLoserSelect) matchLoserSelect.innerHTML = optionsHtml;
 
-      // Set default selected hero for H2H if empty
       const hiddenInput = document.getElementById('h2h-selected-hero-id');
       const searchInput = document.getElementById('h2h-hero-search-input');
       if (hiddenInput && (!hiddenInput.value || !getHero(hiddenInput.value))) {
@@ -1933,7 +1813,6 @@
       }
     }
 
-    // --- Searchable H2H Hero Selector Methods ---
     function openH2HDropdown() {
       renderH2HDropdownList();
       const menu = document.getElementById('h2h-hero-dropdown-menu');
@@ -1976,17 +1855,14 @@
         h.name.toLowerCase().includes(q) || (h.set && h.set.toLowerCase().includes(q))
       );
 
-      // Sort alphabetically
       filtered.sort((a, b) => a.name.localeCompare(b.name));
 
       if (filtered.length === 0) {
         menu.innerHTML = `
-          <div class="p-4 text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-1">
-            <i data-lucide="help-circle" class="w-4 h-4 text-slate-600"></i>
-            <span>ไม่พบฮีโร่ที่ชื่อ "${query}"</span>
+          <div class="p-4 text-center text-xs text-slate-500">
+            ไม่พบฮีโร่ที่ชื่อ "${query}"
           </div>
         `;
-        lucide.createIcons();
         return;
       }
 
@@ -2009,7 +1885,7 @@
         `;
       }).join('');
 
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function selectH2HHero(heroId) {
@@ -2026,7 +1902,6 @@
       renderH2HDossier();
     }
 
-    // Close H2H dropdown when clicking outside
     document.addEventListener('click', function(event) {
       const container = document.getElementById('h2h-search-container');
       if (container && !container.contains(event.target)) {
@@ -2057,7 +1932,6 @@
       const stats = computeHeroStats();
       const heroStat = stats[heroId] || { matches: 0, wins: 0, losses: 0, winrate: 0, headToHead: {} };
 
-      // Head-to-Head details
       const matchupsArray = [];
       Object.keys(heroStat.headToHead).forEach(oppId => {
         const oppData = heroStat.headToHead[oppId];
@@ -2072,15 +1946,12 @@
         });
       });
 
-      // Sort by games played, then winrate
       matchupsArray.sort((a, b) => b.played - a.played || b.winrate - a.winrate);
 
-      // Best and worst matchup
       const best = matchupsArray.length > 0 ? [...matchupsArray].sort((a,b) => b.winrate - a.winrate || b.wins - a.wins)[0] : null;
       const worst = matchupsArray.length > 0 ? [...matchupsArray].sort((a,b) => a.winrate - b.winrate || a.losses - b.losses)[0] : null;
 
       container.innerHTML = `
-        <!-- Hero Overview Header Card -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
           <div class="absolute -right-6 -bottom-6 w-40 h-40 rounded-full blur-3xl opacity-20" style="background-color: ${hero.color}"></div>
           
@@ -2096,7 +1967,6 @@
               </div>
             </div>
 
-            <!-- Stats Pills -->
             <div class="grid grid-cols-3 gap-2 sm:gap-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
               <div class="text-center px-2">
                 <p class="text-[10px] uppercase font-bold text-slate-400">ลงแข่ง</p>
@@ -2113,7 +1983,6 @@
             </div>
           </div>
 
-          <!-- Quick Highlights: Best & Worst Matchup -->
           ${matchupsArray.length > 0 ? `
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5 pt-5 border-t border-slate-800/80">
               <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3 flex items-center justify-between">
@@ -2141,7 +2010,6 @@
           ` : ''}
         </div>
 
-        <!-- Head to Head Breakdown Cards / Table -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
           <div class="flex items-center justify-between mb-4">
             <div>
@@ -2180,7 +2048,6 @@
                       </div>
                     </div>
 
-                    <!-- Progress Bar -->
                     <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
                       <div class="${barColor} h-full rounded-full transition-all duration-500" style="width: ${m.winrate}%"></div>
                     </div>
@@ -2191,15 +2058,13 @@
           `}
         </div>
       `;
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
-    /* ========================================================
-       5.5 TIMELINE (DAILY / MONTHLY / YEARLY) LOGIC
-       ======================================================== */
+    /* 7. TIMELINE BREAKDOWN */
     function setTimelineGranularity(type) {
       timelineGranularity = type;
-      selectedTimelinePeriod = null; // reset to auto latest
+      selectedTimelinePeriod = null;
       
       const btnDay = document.getElementById('period-btn-day');
       const btnMonth = document.getElementById('period-btn-month');
@@ -2213,13 +2078,9 @@
       if (btnMonth) btnMonth.className = type === 'month' ? activeClass : inactiveClass;
       if (btnYear) btnYear.className = type === 'year' ? activeClass : inactiveClass;
 
-      // Show/Hide custom date input only for day view
       if (customDateContainer) {
-        if (type === 'day') {
-          customDateContainer.classList.remove('hidden');
-        } else {
-          customDateContainer.classList.add('hidden');
-        }
+        if (type === 'day') customDateContainer.classList.remove('hidden');
+        else customDateContainer.classList.add('hidden');
       }
 
       renderTimelineView();
@@ -2233,19 +2094,14 @@
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
 
-      if (granularity === 'day') {
-        return `${year}-${month}-${day}`;
-      } else if (granularity === 'month') {
-        return `${year}-${month}`;
-      } else {
-        return `${year}`;
-      }
+      if (granularity === 'day') return `${year}-${month}-${day}`;
+      if (granularity === 'month') return `${year}-${month}`;
+      return `${year}`;
     }
 
     function formatPeriodDisplay(key, granularity) {
       if (!key) return '-';
       const parts = key.split('-');
-      const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
       const fullThaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 
       if (granularity === 'day') {
@@ -2285,7 +2141,6 @@
       const selectEl = document.getElementById('timeline-period-select');
       if (!selectEl) return;
 
-      // Extract unique period keys from all matches
       const periodsSet = new Set();
       matches.forEach(m => {
         const key = getMatchPeriodKey(m.date, timelineGranularity);
@@ -2293,26 +2148,19 @@
       });
 
       const sortedPeriods = Array.from(periodsSet).sort().reverse();
-
       if (sortedPeriods.length === 0) {
-        // Fallback to today if no matches
-        const now = new Date();
-        const fallbackKey = getMatchPeriodKey(now, timelineGranularity);
-        sortedPeriods.push(fallbackKey);
+        sortedPeriods.push(getMatchPeriodKey(new Date(), timelineGranularity));
       }
 
-      // Check if selected period exists in choices, else default to newest
       if (!selectedTimelinePeriod || !sortedPeriods.includes(selectedTimelinePeriod)) {
         selectedTimelinePeriod = sortedPeriods[0];
       }
 
-      // Populate dropdown
       selectEl.innerHTML = sortedPeriods.map(k => {
         const label = formatPeriodDisplay(k, timelineGranularity);
         return `<option value="${k}" ${k === selectedTimelinePeriod ? 'selected' : ''}>${label}</option>`;
       }).join('');
 
-      // Sync custom date input if in day mode
       const customDateInput = document.getElementById('timeline-custom-date');
       if (customDateInput && timelineGranularity === 'day') {
         customDateInput.value = selectedTimelinePeriod || '';
@@ -2328,11 +2176,7 @@
       const currentPeriod = selectedTimelinePeriod;
       const periodLabel = formatPeriodDisplay(currentPeriod, timelineGranularity);
 
-      // Filter matches within this period
-      const periodMatches = matches.filter(m => {
-        const k = getMatchPeriodKey(m.date, timelineGranularity);
-        return k === currentPeriod;
-      });
+      const periodMatches = matches.filter(m => getMatchPeriodKey(m.date, timelineGranularity) === currentPeriod);
 
       if (periodMatches.length === 0) {
         container.innerHTML = `
@@ -2341,24 +2185,19 @@
               <i data-lucide="calendar-off" class="w-6 h-6"></i>
             </div>
             <h3 class="font-bold text-base text-slate-200">ไม่มีการแข่งขันใน ${periodLabel}</h3>
-            <p class="text-xs text-slate-400 mt-1">ยังไม่มีประวัติการบันทึกการเล่นในช่วงเวลานี้ สามารถกด "บันทึกผล" เพื่อเพิ่มแมตช์ได้</p>
-            <button onclick="openNewMatchModal()" class="mt-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs inline-flex items-center gap-1.5 transition">
-              <i data-lucide="plus" class="w-3.5 h-3.5 stroke-[3]"></i> บันทึกแมตช์ของช่วงเวลานี้
-            </button>
+            <p class="text-xs text-slate-400 mt-1">ยังไม่มีประวัติการบันทึกการเล่นในช่วงเวลานี้</p>
           </div>
         `;
-        lucide.createIcons();
+        safeCreateIcons();
         return;
       }
 
-      // Compute Hero Breakdown for this period
       const heroUsage = {};
       let turn1Wins = 0;
 
       periodMatches.forEach(m => {
         if (m.winnerFirstTurn) turn1Wins++;
 
-        // Winner hero
         if (!heroUsage[m.winnerHero]) {
           heroUsage[m.winnerHero] = { hero: getHero(m.winnerHero), played: 0, wins: 0, losses: 0, players: new Set() };
         }
@@ -2366,7 +2205,6 @@
         heroUsage[m.winnerHero].wins++;
         if (m.winnerPlayer) heroUsage[m.winnerHero].players.add(m.winnerPlayer);
 
-        // Loser hero
         if (!heroUsage[m.loserHero]) {
           heroUsage[m.loserHero] = { hero: getHero(m.loserHero), played: 0, wins: 0, losses: 0, players: new Set() };
         }
@@ -2380,7 +2218,6 @@
         return { ...item, winrate: wr };
       });
 
-      // Sort by games played, then wins
       heroList.sort((a, b) => b.played - a.played || b.wins - a.wins || b.winrate - a.winrate);
 
       const mostPickedHero = heroList[0];
@@ -2388,7 +2225,6 @@
       const turn1Winrate = Math.round((turn1Wins / periodMatches.length) * 100);
 
       container.innerHTML = `
-        <!-- Summary Dashboard Cards for this Period -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
             <span class="text-slate-400 text-[11px] font-semibold uppercase flex items-center justify-between">
@@ -2423,17 +2259,12 @@
           </div>
         </div>
 
-        <!-- 2 Columns: Hero Breakdown vs Matches Played -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- Left: Hero Pick & Win/Loss Table (7 cols) -->
           <div class="lg:col-span-7 bg-[#0f172a]/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
             <div class="flex items-center justify-between mb-4">
-              <div>
-                <h3 class="font-title text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                  <i data-lucide="users" class="w-5 h-5 text-amber-400"></i> ตัวละครที่มีการเล่นในรอบนี้ (${heroList.length} ตัว)
-                </h3>
-                <p class="text-xs text-slate-400">สรุปจำนวนเกมและผลการแข่งขันของแต่ละฮีโร่ใน ${periodLabel}</p>
-              </div>
+              <h3 class="font-title text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5 text-amber-400"></i> ตัวละครที่มีการเล่นในรอบนี้ (${heroList.length} ตัว)
+              </h3>
             </div>
 
             <div class="space-y-3">
@@ -2467,7 +2298,6 @@
                       </div>
                     </div>
 
-                    <!-- Progress bar -->
                     <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2.5 overflow-hidden">
                       <div class="${barColor} h-full rounded-full transition-all" style="width: ${item.winrate}%"></div>
                     </div>
@@ -2477,13 +2307,11 @@
             </div>
           </div>
 
-          <!-- Right: Session Matches List (5 cols) -->
           <div class="lg:col-span-5 bg-[#0f172a]/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-title text-base sm:text-lg font-bold text-white flex items-center gap-2">
                 <i data-lucide="list-checks" class="w-5 h-5 text-indigo-400"></i> แมตช์ที่แข่งทั้งหมด (${periodMatches.length})
               </h3>
-              <span class="text-xs text-slate-400">${periodLabel}</span>
             </div>
 
             <div class="space-y-3 overflow-y-auto max-h-[580px] pr-1">
@@ -2503,7 +2331,6 @@
                     </div>
 
                     <div class="flex items-center justify-between gap-2">
-                      <!-- Winner -->
                       <div class="flex items-center gap-2 truncate flex-1">
                         <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${winner.color}"></span>
                         <div class="truncate">
@@ -2516,7 +2343,6 @@
 
                       <span class="text-[10px] font-black text-slate-600 px-1.5 py-0.5 rounded bg-slate-800">VS</span>
 
-                      <!-- Loser -->
                       <div class="flex items-center gap-2 justify-end text-right truncate flex-1">
                         <div class="truncate">
                           <p class="text-xs font-bold text-rose-400 truncate">${loser.name}</p>
@@ -2539,12 +2365,10 @@
         </div>
       `;
 
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
-    /* ========================================================
-       6. MATCH HISTORY LIST VIEW
-       ======================================================== */
+    /* 8. MATCH HISTORY TABLE */
     function renderHistoryTable() {
       const container = document.getElementById('history-list-container');
       if (!container) return;
@@ -2569,11 +2393,10 @@
             ไม่พบประวัติการต่อสู้ที่ตรงกับการค้นหา
           </div>
         `;
-        lucide.createIcons();
+        safeCreateIcons();
         return;
       }
 
-      // Sort by newest first
       const sorted = [...filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
 
       container.innerHTML = sorted.map(m => {
@@ -2585,9 +2408,7 @@
         return `
           <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition relative group">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <!-- Battle Combatants -->
               <div class="flex items-center gap-3 flex-1">
-                <!-- Winner Badge -->
                 <div class="flex items-center gap-2 bg-emerald-950/30 border border-emerald-500/30 px-3 py-1.5 rounded-lg flex-1">
                   <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${winner.color}"></span>
                   <div class="truncate">
@@ -2604,7 +2425,6 @@
 
                 <span class="text-xs font-black text-slate-500 px-1">VS</span>
 
-                <!-- Loser Badge -->
                 <div class="flex items-center gap-2 bg-rose-950/20 border border-rose-500/20 px-3 py-1.5 rounded-lg flex-1">
                   <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${loser.color}"></span>
                   <div class="truncate">
@@ -2614,7 +2434,6 @@
                 </div>
               </div>
 
-              <!-- Map, Date & Delete Action -->
               <div class="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-800 text-[11px] text-slate-400">
                 <div class="text-left sm:text-right">
                   <p class="font-semibold text-amber-400/90 flex items-center gap-1 sm:justify-end">
@@ -2622,10 +2441,6 @@
                   </p>
                   <p class="text-[10px] text-slate-500">${dateStr}</p>
                 </div>
-
-                <button onclick="handleDeleteMatch('${m.id}')" title="ลบแมตช์นี้" class="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
               </div>
             </div>
 
@@ -2637,12 +2452,10 @@
           </div>
         `;
       }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
-    /* ========================================================
-       7. HERO ROSTER VIEW LOGIC
-       ======================================================== */
+    /* 9. ROSTER GRID */
     function renderRosterGrid() {
       const container = document.getElementById('roster-grid');
       const countEl = document.getElementById('roster-count');
@@ -2685,12 +2498,10 @@
           </div>
         `;
       }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
-    /* ========================================================
-       8. MATCH LOGGING & MODAL HANDLERS
-       ======================================================== */
+    /* 10. RECORD & MODAL ACTIONS */
     function formatDateTimeLocal(date) {
       const pad = (n) => String(n).padStart(2, '0');
       const year = date.getFullYear();
@@ -2711,11 +2522,8 @@
     function openNewMatchModal() {
       document.getElementById('form-record-match').reset();
       populateHeroDropdowns();
-      
-      // Default datetime-local to current device local time
       setCurrentDateTimeToInput();
 
-      // Ensure Winner and Loser are different by default
       const winnerSel = document.getElementById('match-winner-hero');
       const loserSel = document.getElementById('match-loser-hero');
       if (winnerSel && loserSel && heroes.length > 1) {
@@ -2763,34 +2571,15 @@
       showToast('บันทึกผลการแข่งขันเรียบร้อยแล้ว!');
 
       refreshAllViews();
-    }
 
-    async function handleDeleteMatch(id) {
-      if (!confirm('ต้องการลบประวัติการแข่งแมตช์นี้หรือไม่?')) return;
-      
-      // Optimistic local remove
-      matches = matches.filter(m => m.id !== id);
-      refreshAllViews();
-
-      // Cloud deletion
-      if (isCloudReady && db && auth.currentUser) {
-        try {
-          const { doc, deleteDoc } = window._fb;
-          const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'matches', id));
-          showToast('ลบแมตช์ออกจากคลาวด์เรียบร้อย');
-        } catch(err) {
-          console.error('Error deleting match from cloud:', err);
-          showToast('ลบสำเร็จในเครื่อง');
-        }
-      } else {
-        showToast('ลบแมตช์เรียบร้อยแล้ว');
+      if (isCloudReady && db) {
+        const { doc, setDoc } = window._fb;
+        setDoc(doc(db, 'unmatched_matches', newMatch.id), newMatch).catch(err => {
+          console.warn('Stored locally, cloud sync error:', err.message);
+        });
       }
     }
 
-    /* ========================================================
-       9. CUSTOM HERO CREATION (SAVING TO CLOUD)
-       ======================================================== */
     function openCustomHeroModal() {
       document.getElementById('form-custom-hero').reset();
       openModal('modal-custom-hero');
@@ -2808,45 +2597,54 @@
       const newHero = { id: slug, name, set, color };
 
       heroes.push(newHero);
+      saveLocalData();
       populateHeroDropdowns();
       closeModal('modal-custom-hero');
       renderRosterGrid();
       renderLeaderboard();
 
-      // Sync to Cloud Firestore
-      if (isCloudReady && db && auth.currentUser) {
+      if (isCloudReady && db) {
         try {
           const { doc, setDoc } = window._fb;
-          const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'heroes', slug), newHero);
-          showToast(`เพิ่มฮีโร่ "${name}" ขึ้นคลาวด์เรียบร้อย!`);
-        } catch(err) {
-          console.error('Error saving hero to cloud:', err);
-          showToast(`เพิ่มฮีโร่ "${name}" เรียบร้อย!`);
-        }
-      } else {
-        showToast(`เพิ่มฮีโร่ "${name}" เรียบร้อย!`);
+          await setDoc(doc(db, 'unmatched_heroes', slug), newHero);
+        } catch(err) {}
+      }
+      showToast(`เพิ่มฮีโร่ "${name}" เรียบร้อย!`);
+    }
+
+    /* 11. MODAL & DATA UTILITIES */
+    function openSettingsModal() {
+      const configTextarea = document.getElementById('custom-firebase-config');
+      const saved = localStorage.getItem(CUSTOM_FIREBASE_STORAGE_KEY);
+      if (configTextarea && saved && !configTextarea.value) {
+        configTextarea.value = saved;
+      }
+      openModal('modal-settings');
+      safeCreateIcons();
+    }
+
+    function safeCreateIcons() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        try {
+          lucide.createIcons();
+        } catch(e) {}
       }
     }
 
-    /* ========================================================
-       10. BACKUP, RESTORE & MODAL UTILITIES
-       ======================================================== */
-    function openSettingsModal() {
-      openModal('modal-settings');
-    }
-
     function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
     }
 
     function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
     }
 
     function showToast(message) {
       const toast = document.getElementById('toast');
       const text = document.getElementById('toast-message');
+      if (!toast || !text) return;
       text.innerText = message;
       toast.classList.remove('translate-y-20', 'opacity-0');
       setTimeout(() => {
@@ -2857,8 +2655,7 @@
     function exportData() {
       const payload = {
         app: 'UnmatchedTracker',
-        version: 2.1,
-        storageType: 'CloudSync',
+        version: 2.2,
         exportedAt: new Date().toISOString(),
         heroes,
         players,
@@ -2880,7 +2677,7 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = async function(e) {
+      reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
           if (imported.matches && Array.isArray(imported.matches)) matches = imported.matches;
@@ -2894,7 +2691,7 @@
           closeModal('modal-settings');
           showToast('นำเข้าข้อมูลสำเร็จ!');
         } catch(err) {
-          showToast('ไฟล์ JSON ไม่ถูกต้องหรือไม่ตรงรูปแบบ');
+          showToast('ไฟล์ JSON ไม่ถูกต้อง');
         }
       };
       reader.readAsText(file);
@@ -2903,58 +2700,29 @@
     async function loadSampleData() {
       matches = [...SAMPLE_MATCHES];
       heroes = [...DEFAULT_HEROES];
-      if (isCloudReady && db && auth.currentUser) {
-        try {
-          const { doc, setDoc } = window._fb;
-          const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-          for (const m of SAMPLE_MATCHES) {
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'matches', m.id), m);
-          }
-          for (const h of DEFAULT_HEROES) {
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'heroes', h.id), h);
-          }
-        } catch(err) {
-          console.error(err);
-        }
-      }
+      players = [...DEFAULT_PLAYERS];
+      saveLocalData();
       populateHeroDropdowns();
+      populatePlayerDropdowns();
       refreshAllViews();
       closeModal('modal-settings');
       showToast('โหลดข้อมูลตัวอย่างเรียบร้อยแล้ว');
     }
 
     async function clearAllData() {
-      if (!confirm('ต้องการล้างประวัติการแข่งทั้งหมดใช่หรือไม่? ข้อมูลบนคลาวด์จะถูกลบถาวร')) return;
-      
-      const toDelete = [...matches];
       matches = [];
+      saveLocalData();
       refreshAllViews();
-
-      if (isCloudReady && db && auth.currentUser) {
-        try {
-          const { doc, deleteDoc } = window._fb;
-          const appId = typeof __app_id !== 'undefined' ? __app_id : 'unmatched-battle-tracker';
-          for (const m of toDelete) {
-            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'matches', m.id));
-          }
-        } catch(err) {
-          console.error(err);
-        }
-      }
       closeModal('modal-settings');
       showToast('ล้างประวัติการแข่งขันเรียบร้อย');
     }
 
-    // Window Load Event & Firebase Hook
     window.addEventListener('firebase-sdk-ready', () => {
       initCloudDatabase();
     });
 
     window.onload = function() {
-      // Check Security gate status first
       checkAuthStatus();
-
-      // If Firebase SDK ready event already fired or delayed, ensure fallback kicks in
       setTimeout(() => {
         if (!isCloudReady && heroes.length === 0) {
           initCloudDatabase();
