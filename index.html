@@ -747,6 +747,10 @@
               <input type="file" id="import-file-input" accept=".json" onchange="importData(event)" class="hidden">
             </label>
           </div>
+          <!-- ปุ่ม Force Sync ข้อมูลปัจจุบันขึ้น Cloud -->
+          <button type="button" onclick="pushAllLocalDataToCloud()" class="w-full mt-2.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i> ซิงค์ข้อมูลทั้งหมดขึ้น Cloud เดี๋ยวนี้
+          </button>
         </div>
 
         <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-2">
@@ -2672,12 +2676,43 @@
       showToast('ดาวน์โหลดไฟล์ข้อมูลสำรองสำเร็จ!');
     }
 
+    async function pushAllLocalDataToCloud() {
+      if (!isCloudReady || !db || !window._fb) {
+        showToast('กรุณาเชื่อมต่อ Cloud ให้สถานะขึ้นสีเขียวก่อนซิงค์');
+        return;
+      }
+      showToast('กำลังส่งข้อมูลขึ้น Firestore...');
+      try {
+        const { doc, setDoc } = window._fb;
+
+        // 1. ส่งข้อมูลผู้เล่น
+        for (const p of players) {
+          if (p.id) await setDoc(doc(db, 'unmatched_players', p.id), p);
+        }
+
+        // 2. ส่งข้อมูลฮีโร่
+        for (const h of heroes) {
+          if (h.id) await setDoc(doc(db, 'unmatched_heroes', h.id), h);
+        }
+
+        // 3. ส่งข้อมูลประวัติแมตช์
+        for (const m of matches) {
+          if (m.id) await setDoc(doc(db, 'unmatched_matches', m.id), m);
+        }
+
+        showToast('อัปโหลดข้อมูลทั้งหมดขึ้น Cloud สำเร็จแล้ว!');
+      } catch (err) {
+        console.error('Cloud sync error during push:', err);
+        showToast('เกิดข้อผิดพลาดในการซิงค์: ' + (err.message || 'ตรวจสิทธิ์ Rules'));
+      }
+    }
+
     function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const imported = JSON.parse(e.target.result);
           if (imported.matches && Array.isArray(imported.matches)) matches = imported.matches;
@@ -2689,9 +2724,19 @@
           populatePlayerDropdowns();
           refreshAllViews();
           closeModal('modal-settings');
-          showToast('นำเข้าข้อมูลสำเร็จ!');
+
+          // ถ้า Cloud เชื่อมต่ออยู่ ให้ยิงข้อมูลขึ้น Firestore ทันที
+          if (isCloudReady && db && window._fb) {
+            showToast('นำเข้าสำเร็จ! กำลังซิงค์ขึ้น Cloud...');
+            await pushAllLocalDataToCloud();
+          } else {
+            showToast('นำเข้าข้อมูลลงในเครื่องสำเร็จ!');
+          }
         } catch(err) {
-          showToast('ไฟล์ JSON ไม่ถูกต้อง');
+          console.error(err);
+          showToast('ไฟล์ JSON ไม่ถูกต้อง หรือโครงสร้างผิดพลาด');
+        } finally {
+          event.target.value = ''; // รีเซ็ต input file
         }
       };
       reader.readAsText(file);
