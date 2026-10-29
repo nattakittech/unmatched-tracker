@@ -439,7 +439,8 @@
         </div>
       </div>
 
-      <div id="roster-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+      <!-- ปรับจำนวนคอลัมน์ให้กว้างขึ้น เพื่อให้รูปภาพใหญ่และดูโดดเด่นขึ้น -->
+      <div id="roster-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
       </div>
     </section>
 
@@ -1309,10 +1310,10 @@
     }
 
     // Helper ในการสร้าง Avatar ของฮีโร่
-    function renderHeroAvatar(hero, sizeClass = 'w-10 h-20', textClass = 'text-base font-bold') {
+    function renderHeroAvatar(hero, sizeClass = 'w-10 h-10', textClass = 'text-base font-bold') {
       if (hero.imageUrl) {
         return `
-          <div class="${sizeClass} rounded-xl overflow-hidden shrink-0 border border-white/30 bg-slate-800 shadow">
+          <div class="${sizeClass} rounded-xl overflow-hidden shrink-0 border border-white/20 bg-slate-800 shadow">
             <img src="${hero.imageUrl}" alt="${hero.name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.parentElement.outerHTML='<div class=\\'${sizeClass} rounded-xl flex items-center justify-center text-white ${textClass} shrink-0 shadow\\' style=\\'background-color:${hero.color}\\'>${hero.name.charAt(0)}</div>';">
           </div>
         `;
@@ -2041,8 +2042,16 @@
 
       matchupsArray.sort((a, b) => b.played - a.played || b.winrate - a.winrate);
 
-      const best = matchupsArray.length > 0 ? [...matchupsArray].sort((a,b) => b.winrate - a.winrate || b.wins - a.wins)[0] : null;
-      const worst = matchupsArray.length > 0 ? [...matchupsArray].sort((a,b) => a.winrate - b.winrate || a.losses - b.losses)[0] : null;
+      // กรองเฉพาะคู่ต่อสู้ที่มีการปะทะกันตั้งแต่ 2 แมตช์ขึ้นไป
+      const qualifiedMatchups = matchupsArray.filter(m => m.played >= 2);
+
+      const best = qualifiedMatchups.length > 0 
+        ? [...qualifiedMatchups].sort((a, b) => b.winrate - a.winrate || b.wins - a.wins)[0] 
+        : null;
+
+      const worst = qualifiedMatchups.length > 0 
+        ? [...qualifiedMatchups].sort((a, b) => a.winrate - b.winrate || a.losses - b.losses)[0] 
+        : null;
 
       container.innerHTML = `
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
@@ -2079,7 +2088,7 @@
             </div>
           </div>
 
-          ${matchupsArray.length > 0 ? `
+          ${qualifiedMatchups.length > 0 ? `
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5 pt-5 border-t border-slate-800/80">
               <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3 flex items-center justify-between">
                 <div>
@@ -2087,7 +2096,7 @@
                     <i data-lucide="check" class="w-3.5 h-3.5"></i> Best Matchup (ชนะทางที่สุด)
                   </span>
                   <p class="text-sm font-bold text-white mt-1">vs ${best.opponent.name}</p>
-                  <p class="text-[11px] text-slate-400">สถิติ: ชนะ ${best.wins} - แพ้ ${best.losses} (${best.winrate}%)</p>
+                  <p class="text-[11px] text-slate-400">สถิติ: ชนะ ${best.wins} - แพ้ ${best.losses} (${best.winrate}%) • แข่ง ${best.played} แมตช์</p>
                 </div>
                 ${renderHeroAvatar(best.opponent, 'w-8 h-8', 'text-xs')}
               </div>
@@ -2098,12 +2107,18 @@
                     <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Tough Matchup (แพ้ทาง/สูสี)
                   </span>
                   <p class="text-sm font-bold text-white mt-1">vs ${worst.opponent.name}</p>
-                  <p class="text-[11px] text-slate-400">สถิติ: ชนะ ${worst.wins} - แพ้ ${worst.losses} (${worst.winrate}%)</p>
+                  <p class="text-[11px] text-slate-400">สถิติ: ชนะ ${worst.wins} - แพ้ ${worst.losses} (${worst.winrate}%) • แข่ง ${worst.played} แมตช์</p>
                 </div>
                 ${renderHeroAvatar(worst.opponent, 'w-8 h-8', 'text-xs')}
               </div>
             </div>
-          ` : ''}
+          ` : `
+            <div class="mt-5 pt-4 border-t border-slate-800/80 text-center text-xs text-slate-500">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/80 border border-slate-800 text-slate-400">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-amber-400"></i> ต้องมีประวัติเจอกับคู่ต่อสู้เดียวกันอย่างน้อย 2 แมตช์ขึ้นไป จึงจะแสดง Best & Tough Matchup
+              </span>
+            </div>
+          `}
         </div>
 
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
@@ -2599,29 +2614,30 @@
         const s = stats[h.id] || { matches: 0, wins: 0, losses: 0, winrate: 0 };
 
         return `
-          <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl p-3.5 group transition-all hover:scale-[1.02] shadow-lg flex flex-col justify-between relative">
-            <button onclick="event.stopPropagation(); openEditHeroModal('${h.id}')" title="แก้ไข/ใส่รูป" class="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-950/80 hover:bg-amber-500 hover:text-slate-950 text-slate-400 transition z-10">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+          <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-2xl p-4 group transition-all hover:scale-[1.02] shadow-xl flex flex-col justify-between relative overflow-hidden">
+            <button onclick="event.stopPropagation(); openEditHeroModal('${h.id}')" title="แก้ไข/ใส่รูป" class="absolute top-3 right-3 p-2 rounded-xl bg-slate-950/80 hover:bg-amber-500 hover:text-slate-950 text-slate-400 transition z-10 backdrop-blur-md border border-slate-800">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
             </button>
             <div onclick="jumpToH2H('${h.id}')" class="cursor-pointer">
-              <div class="w-full h-40 rounded-lg mb-2.5 overflow-hidden flex items-center justify-center relative bg-slate-950 border border-slate-800">
+              <!-- ขยายความสูงรูปภาพจาก h-24 เป็น h-44 หรือ sm:h-48 เพื่อให้ภาพใหญ่และคมชัด -->
+              <div class="w-full h-44 sm:h-48 rounded-xl mb-3 overflow-hidden flex items-center justify-center relative bg-slate-950 border border-slate-800/80 shadow-inner">
                 ${h.imageUrl ? `
                   <img src="${h.imageUrl}" alt="${h.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                  <div class="w-full h-full items-center justify-center font-title font-bold text-2xl text-white hidden" style="background-color: ${h.color}">${h.name.charAt(0)}</div>
+                  <div class="w-full h-full items-center justify-center font-title font-black text-4xl text-white hidden" style="background-color: ${h.color}">${h.name.charAt(0)}</div>
                 ` : `
-                  <div class="w-full h-full flex items-center justify-center font-title font-bold text-2xl text-white shadow-inner" style="background-color: ${h.color}">
+                  <div class="w-full h-full flex items-center justify-center font-title font-black text-4xl text-white shadow-inner" style="background-color: ${h.color}">
                     ${h.name.charAt(0)}
                   </div>
                 `}
               </div>
-              <h4 class="font-bold text-xs sm:text-sm text-white group-hover:text-amber-400 transition truncate">${h.name}</h4>
-              <p class="text-[10px] text-slate-400 truncate mt-0.5">${h.set}</p>
+              <h4 class="font-title font-bold text-sm sm:text-base text-white group-hover:text-amber-400 transition truncate">${h.name}</h4>
+              <p class="text-xs text-slate-400 truncate mt-0.5">${h.set}</p>
             </div>
 
-            <div onclick="jumpToH2H('${h.id}')" class="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] cursor-pointer">
-              <span class="text-slate-400">${s.matches} แมตช์</span>
+            <div onclick="jumpToH2H('${h.id}')" class="mt-3.5 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs cursor-pointer">
+              <span class="text-slate-400 font-medium">${s.matches} แมตช์</span>
               <span class="font-bold ${s.winrate >= 50 ? 'text-emerald-400' : 'text-slate-400'}">
-                ${s.matches > 0 ? s.winrate + '%' : '-'}
+                ${s.matches > 0 ? s.winrate + '% WR' : '-'}
               </span>
             </div>
           </div>
