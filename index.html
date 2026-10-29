@@ -416,9 +416,21 @@
           </h2>
           <p class="text-xs text-slate-400">คลิกที่ฮีโร่ตัวใดก็ได้เพื่อไปหน้าวิเคราะห์สถิติ H2H</p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- กล่องตัวเลือกการจัดเรียง -->
+          <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-300">
+            <i data-lucide="arrow-down-up" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+            <span class="text-slate-400 text-[11px] hidden sm:inline">เรียงตาม:</span>
+            <select id="roster-sort-by" onchange="renderRosterGrid()" class="bg-transparent text-amber-300 font-bold focus:outline-none cursor-pointer text-xs">
+              <option value="set" class="bg-slate-900 text-slate-100">📦 กล่องที่ขาย (Set)</option>
+              <option value="name" class="bg-slate-900 text-slate-100">🔤 ชื่อฮีโร่ (A-Z)</option>
+              <option value="winrate" class="bg-slate-900 text-slate-100">🏆 Win Rate สูงสุด</option>
+              <option value="matches" class="bg-slate-900 text-slate-100">🔥 จำนวนเกมที่เล่น</option>
+            </select>
+          </div>
+
           <div class="relative">
-            <input type="text" id="roster-search" oninput="renderRosterGrid()" placeholder="ค้นหาฮีโร่หรือกล่อง..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-amber-500 w-44">
+            <input type="text" id="roster-search" oninput="renderRosterGrid()" placeholder="ค้นหาฮีโร่หรือกล่อง..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-amber-500 w-36 sm:w-44">
             <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5"></i>
           </div>
           <button onclick="openCustomHeroModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg shadow-indigo-600/20 shrink-0">
@@ -1171,6 +1183,8 @@
           if (!snapshot.empty) {
             const cloudHeroes = [];
             snapshot.forEach(docSnap => cloudHeroes.push(docSnap.data()));
+            // เรียงลำดับฮีโร่ให้คงที่เสมอเมื่อดึงจาก Cloud
+            cloudHeroes.sort((a, b) => (a.set || '').localeCompare(b.set || '') || a.name.localeCompare(b.name));
             heroes = cloudHeroes;
           } else {
             heroes = [...DEFAULT_HEROES];
@@ -2541,13 +2555,36 @@
     function renderRosterGrid() {
       const container = document.getElementById('roster-grid');
       const countEl = document.getElementById('roster-count');
+      const sortSelect = document.getElementById('roster-sort-by');
       if (!container) return;
 
+      const sortBy = sortSelect ? sortSelect.value : 'set';
       const search = (document.getElementById('roster-search')?.value || '').toLowerCase();
-      const filtered = heroes.filter(h => h.name.toLowerCase().includes(search) || h.set.toLowerCase().includes(search));
+      let filtered = heroes.filter(h => h.name.toLowerCase().includes(search) || (h.set && h.set.toLowerCase().includes(search)));
 
       if (countEl) countEl.innerText = filtered.length;
       const stats = computeHeroStats();
+
+      // การจัดเรียงตามตัวเลือกที่เลือก
+      filtered.sort((a, b) => {
+        const statA = stats[a.id] || { matches: 0, wins: 0, winrate: 0 };
+        const statB = stats[b.id] || { matches: 0, wins: 0, winrate: 0 };
+
+        if (sortBy === 'name') {
+          return a.name.localeCompare(b.name);
+        } else if (sortBy === 'winrate') {
+          if (statB.winrate !== statA.winrate) return statB.winrate - statA.winrate;
+          return statB.matches - statA.matches || a.name.localeCompare(b.name);
+        } else if (sortBy === 'matches') {
+          if (statB.matches !== statA.matches) return statB.matches - statA.matches;
+          return statB.winrate - statA.winrate || a.name.localeCompare(b.name);
+        } else {
+          // ค่าเริ่มต้น: เรียงตามชื่อกล่อง (Set) ก่อน แล้วค่อยเรียงตามชื่อฮีโร่ในกล่องนั้น
+          const setCompare = (a.set || '').localeCompare(b.set || '');
+          if (setCompare !== 0) return setCompare;
+          return a.name.localeCompare(b.name);
+        }
+      });
 
       if (filtered.length === 0) {
         container.innerHTML = `
