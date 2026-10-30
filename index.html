@@ -2482,9 +2482,7 @@
                   <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 hover:border-slate-700 transition">
                     <div class="flex items-center justify-between gap-3">
                       <div class="flex items-center gap-3 truncate">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow text-sm shrink-0" style="background-color: ${h.color}">
-                          ${h.name.charAt(0)}
-                        </div>
+                        ${renderHeroAvatar(h, 'w-9 h-9', 'text-xs')}
                         <div class="truncate">
                           <div class="flex items-center gap-2">
                             <span class="font-bold text-sm text-white hover:text-amber-400 cursor-pointer transition" onclick="jumpToH2H('${h.id}')">${h.name}</span>
@@ -2536,7 +2534,7 @@
 
                     <div class="flex items-center justify-between gap-2">
                       <div class="flex items-center gap-2 truncate flex-1">
-                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${winner.color}"></span>
+                        ${renderHeroAvatar(winner, 'w-7 h-7', 'text-[10px]')}
                         <div class="truncate">
                           <p class="text-xs font-bold text-emerald-400 truncate flex items-center gap-1">
                             ${winner.name} <i data-lucide="crown" class="w-3 h-3"></i>
@@ -2552,7 +2550,7 @@
                           <p class="text-xs font-bold text-rose-400 truncate">${loser.name}</p>
                           <p class="text-[10px] text-slate-400 truncate">${m.loserPlayer ? m.loserPlayer : 'ผู้เล่น 2'}</p>
                         </div>
-                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${loser.color}"></span>
+                        ${renderHeroAvatar(loser, 'w-7 h-7', 'text-[10px]')}
                       </div>
                     </div>
 
@@ -2617,8 +2615,8 @@
           <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition relative group">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div class="flex items-center gap-3 flex-1">
-                <div class="flex items-center gap-2 bg-emerald-950/30 border border-emerald-500/30 px-3 py-1.5 rounded-lg flex-1">
-                  <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${winner.color}"></span>
+                <div class="flex items-center gap-2.5 bg-emerald-950/30 border border-emerald-500/30 px-3 py-2 rounded-lg flex-1">
+                  ${renderHeroAvatar(winner, 'w-8 h-8', 'text-xs')}
                   <div class="truncate">
                     <p class="text-xs font-bold text-emerald-400 flex items-center gap-1">
                       ${winner.name} <i data-lucide="crown" class="w-3 h-3 text-emerald-400"></i>
@@ -2633,8 +2631,8 @@
 
                 <span class="text-xs font-black text-slate-500 px-1">VS</span>
 
-                <div class="flex items-center gap-2 bg-rose-950/20 border border-rose-500/20 px-3 py-1.5 rounded-lg flex-1">
-                  <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${loser.color}"></span>
+                <div class="flex items-center gap-2.5 bg-rose-950/20 border border-rose-500/20 px-3 py-2 rounded-lg flex-1">
+                  ${renderHeroAvatar(loser, 'w-8 h-8', 'text-xs')}
                   <div class="truncate">
                     <p class="text-xs font-bold text-rose-400">${loser.name}</p>
                     <p class="text-[10px] text-slate-400 truncate">${m.loserPlayer ? `ผู้เล่น: ${m.loserPlayer}` : 'ผู้เล่น 2'}</p>
